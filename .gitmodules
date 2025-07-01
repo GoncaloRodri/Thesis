@@ -1,3 +1,6 @@
 [submodule "report"]
 	path = report
 	url = https://github.com/GoncaloRodri/thesis-report.git
+[submodule "tor"]
+	path = tor
+	url = https://gitlab.torproject.org/GoncaloRodri/differential-privacy-tor.git
