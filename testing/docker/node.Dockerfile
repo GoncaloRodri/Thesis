@@ -11,7 +11,7 @@ WORKDIR /app
 
 COPY tor /app/tor
 
-RUN cd /app/tor ./autogen.sh && \ 
+RUN cd /app/tor && ./autogen.sh && \ 
 ./configure --disable-manpage --disable-asciidoc \
     --disable-html-manual --disable-unittests && make && make install
 
