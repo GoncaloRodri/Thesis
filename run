@@ -1,0 +1,32 @@
+#!/bin/bash
+
+case "$1" in
+"r" | "run")
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/config.yaml -v"
+    exit 0
+    ;;
+"b" | "build")
+    docker buildx build \
+        -t dptor_node \
+        -f testing/docker/node.Dockerfile \
+        .
+    exit 0
+    ;;
+"a" | "analyze")
+    sh -c "python3 testing/scripts/analyzer/main.py"
+    exit 0
+    ;;
+"p" | "plot")
+    sh -c "python3 testing/scripts/ploter/main.py"
+    exit 0
+    ;;
+"c" | "config")
+    nano testing/scripts/tester/config.yaml
+    exit 0
+    ;;
+*)
+    echo "Invalid option: $1"
+    exit 1
+    ;;
+
+esac

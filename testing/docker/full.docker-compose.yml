@@ -1,0 +1,233 @@
+services:
+  authority:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs:/app/logs/
+    environment:
+      - NAME=authority
+      - RELAY_TYPE=authority
+    networks:
+      net:
+        ipv4_address: 10.5.0.255
+
+  relay1:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay1
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.101
+    
+  relay2:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay2
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.102
+
+  relay3:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay3
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.103
+    
+  relay4:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay4
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.104
+
+  relay5:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay5
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.105
+    
+  relay6:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay6
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.106
+
+  relay7:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay7
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.107
+    
+  relay8:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay8
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.108
+
+  relay9:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay9
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.109
+
+  relay10:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay10
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.110
+
+  relay11:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay11
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.111
+
+  relay12:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=relay12
+      - RELAY_TYPE=relay
+    networks:
+      net:
+        ipv4_address: 10.5.0.112
+
+
+  exit1:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=exit1
+      - RELAY_TYPE=exit
+    networks:
+      net:
+        ipv4_address: 10.5.0.201
+  exit2:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=exit2
+      - RELAY_TYPE=exit
+    networks:
+      net:
+        ipv4_address: 10.5.0.202
+  exit3:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=exit3
+      - RELAY_TYPE=exit
+    networks:
+      net:
+        ipv4_address: 10.5.0.203
+      
+  exit4:
+    image: dptor_node
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=exit4
+      - RELAY_TYPE=exit
+    networks:
+      net:
+        ipv4_address: 10.5.0.204
+
+  client:
+    image: dptor_node
+    ports:
+      - 9000:9000
+    volumes:
+      - ./configuration/:/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - NAME=client1
+      - RELAY_TYPE=client
+    networks:
+      - net
+
+  httpbin:
+    image: kennethreitz/httpbin
+    ports:
+      - 8000:80
+    networks:
+      net:
+        ipv4_address: 10.5.0.200
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.5.0.0/16
+      

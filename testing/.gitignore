@@ -1,0 +1,10 @@
+logs
+tmp
+scripts/ploter/*.png
+scripts/ploter/**/*.png
+
+# Ignore Python cache files
+__pycache__
+*.pyc
+*.pyo
+*.pyd

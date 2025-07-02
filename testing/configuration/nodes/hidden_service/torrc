@@ -1,0 +1,7 @@
+%include /app/conf/tor.common.torrc
+%include /app/conf/tor.client.torrc
+%include /app/conf/tor.hs.torrc
+
+Nickname hs
+Address 10.5.0.20
+ContactInfo hs <hs AT localhost>
