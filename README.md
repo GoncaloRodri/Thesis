@@ -32,6 +32,13 @@ This might fail if you don't have access to the private [Differential-Privacy-To
 git clone <repository-url> tor 
 ```
 
+### Dependencies
+To launch the testing tools, you need to have Docker and Docker Compose installed. For that, please follow the instructions on the [Docker installation page](https://docs.docker.com/get-docker/) and [Docker Compose installation page](https://docs.docker.com/compose/install/).
+
+```bash
+apt install -y python3 python3-pip yq jq
+```
+
 ## 🧪 Testing Tools
 The testing tools are located in the `testing` folder. This folder contains all the necessary files to run tests, analyze results, and plot graphs. 
 

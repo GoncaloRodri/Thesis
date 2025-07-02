@@ -18,7 +18,7 @@ get_url() {
 }
 
 get_logfile() {
-    local logfile="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}/curl/${1}-${2}/curl.log"
+    local logfile="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}curl.log"
     echo "$logfile"
 }
 

@@ -1,1 +1,20 @@
-{}
+{
+    "PRIV_KIST-LAPLACE-0-0dum-5Clients-5242880": {
+        "latency": 0.08644705,
+        "throughput": 953988.9,
+        "total_time": 0.11128584999999999,
+        "jitter": 0.09198187733337908
+    },
+    "PRIV_KIST-LAPLACE-0-0.01dum-5Clients-5242880": {
+        "latency": 0.08303109999999998,
+        "throughput": 1078837.0,
+        "total_time": 0.09704789999999999,
+        "jitter": 0.09790550831049809
+    },
+    "PRIV_KIST-LAPLACE-0-0.1dum-5Clients-5242880": {
+        "latency": 0.08323685,
+        "throughput": 1041532.65,
+        "total_time": 0.10153559999999999,
+        "jitter": 0.07321661222683319
+    }
+}

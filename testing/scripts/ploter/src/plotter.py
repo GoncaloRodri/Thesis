@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import os
+
 
 def plot_dummy(metric, filesize, data, show=False):
     print(data)
@@ -59,10 +61,12 @@ def plot_dummy(metric, filesize, data, show=False):
     plt.title(f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})")
     plt.xlabel("Packet Generation Epsilon")
     plt.ylabel(get_units(metric))
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"figures/dummy/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(" ", "_")}.png")
+    plt.savefig(
+        f"{abs_path()}/dummy/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(" ", "_")}.png"
+    )
     if show:
         plt.show()
     plt.clf()
@@ -92,13 +96,16 @@ def plot_jitter_by_distribution(metric, dist, filesize, data, show=False):
     )
     plt.xlabel("Jitter Induction Epsilon")
     plt.ylabel(get_units(metric))
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"figures/jitter/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(' ', '_')}_{dist}.png")
+    plt.savefig(
+        f"{abs_path()}/jitter/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(' ', '_')}_{dist}.png"
+    )
     if show:
         plt.show()
     plt.clf()
+
 
 def plot_jitter(metric, filesize, data, accepted_eps, show=False):
     for (sched, dummy, file_size, dist), group in data.groupby(
@@ -123,10 +130,12 @@ def plot_jitter(metric, filesize, data, accepted_eps, show=False):
     plt.title(f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})")
     plt.xlabel("Jitter Induction Epsilon")
     plt.ylabel(get_units(metric))
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"figures/jitter/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(' ', '_')}.png")
+    plt.savefig(
+        f"{abs_path()}/jitter/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(' ', '_')}.png"
+    )
     if show:
         plt.show()
     plt.clf()
@@ -155,10 +164,12 @@ def plot_jitter_dummy(metric, filesize, data, accepted_dummy, accepted_eps, show
     plt.title(f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})")
     plt.xlabel("Dummy Epsilon")
     plt.ylabel("Jitter Induction Epsilon")
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"figures/jitter_dummy/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(' ', '_')}.png")
+    plt.savefig(
+        f"{abs_path()}/jitter_dummy/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(' ', '_')}.png"
+    )
     if show:
         plt.show()
     plt.clf()
@@ -207,7 +218,7 @@ def plot_dummy_count(data, show=False):
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(
-        f"figures/dummy_count/dummies_vs_cells_{get_file_sizes(file_size).lower().replace(' ', '_')}.png"
+        f"{abs_path()}/dummy_count/dummies_vs_cells_{get_file_sizes(file_size).lower().replace(' ', '_')}.png"
     )
     if show:
         plt.show()
@@ -239,6 +250,7 @@ def get_units(metric):
     else:
         return metric
 
+
 def get_file_sizes(size):
     if size == "51200":
         return "50 KiB"
@@ -248,3 +260,13 @@ def get_file_sizes(size):
         return "10 MiB"
     else:
         return size
+
+
+def abs_path():
+    """
+    Get the absolute path of the current working directory.
+
+    Returns:
+        str: Absolute path of the current working directory.
+    """
+    return f"{os.getcwd()}/testing/results/figures"

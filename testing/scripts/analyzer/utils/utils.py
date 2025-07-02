@@ -1,5 +1,5 @@
-import yaml
 import os
+
 
 def get_config():
     return {
@@ -29,9 +29,15 @@ def get_outliers_num_packers() -> int:
     """
     return get_config()["outliers_num_packets"]
 
+
 def get_tor_log_files() -> list:
     tor_folder = get_config()["tor_logs_folder"]
-    return [os.path.join(tor_folder, f) for f in os.listdir(tor_folder) if os.path.isfile(os.path.join(tor_folder, f))]
+    return [
+        os.path.join(tor_folder, f)
+        for f in os.listdir(tor_folder)
+        if os.path.isfile(os.path.join(tor_folder, f))
+    ]
+
 
 def get_curl_log_files() -> list:
     """
@@ -44,7 +50,12 @@ def get_curl_log_files() -> list:
         str: Path to the curl log file.
     """
     curl_folder = get_config()["curl_logs_folder"]
-    return [os.path.join(curl_folder, f) for f in os.listdir(curl_folder) if os.path.isfile(os.path.join(curl_folder, f))]
+    return [
+        os.path.join(curl_folder, f)
+        for f in os.listdir(curl_folder)
+        if os.path.isfile(os.path.join(curl_folder, f))
+    ]
+
 
 def get_test_name(
     size: str,

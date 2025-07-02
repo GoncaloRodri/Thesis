@@ -13,11 +13,23 @@ case "$1" in
     exit 0
     ;;
 "a" | "analyze")
+    python3 -m venv testing/scripts/analyzer/venv
+    source testing/scripts/analyzer/venv/bin/activate
+    pip install -r testing/scripts/analyzer/requirements.txt
     sh -c "python3 testing/scripts/analyzer/main.py"
+    deactivate
     exit 0
     ;;
 "p" | "plot")
+    python3 -m venv testing/scripts/ploter/venv
+    source testing/scripts/ploter/venv/bin/activate
+    pip install -r testing/scripts/ploter/requirements.txt
+    mkdir -p testing/results/figures/dummy
+    mkdir -p testing/results/figures/jitter
+    mkdir -p testing/results/figures/jitter_dummy
+    mkdir -p testing/results/figures/dummy_count
     sh -c "python3 testing/scripts/ploter/main.py"
+    deactivate
     exit 0
     ;;
 "c" | "config")

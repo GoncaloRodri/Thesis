@@ -1,6 +1,22 @@
 {
-    "latency": {},
-    "throughput": {},
-    "total_time": {},
-    "jitter": {}
+    "latency": {
+        "PRIV_KIST-LAPLACE-0-0dum-5Clients-5242880": 0.08644705,
+        "PRIV_KIST-LAPLACE-0-0.01dum-5Clients-5242880": 0.08303109999999998,
+        "PRIV_KIST-LAPLACE-0-0.1dum-5Clients-5242880": 0.08323685
+    },
+    "throughput": {
+        "PRIV_KIST-LAPLACE-0-0dum-5Clients-5242880": 953988.9,
+        "PRIV_KIST-LAPLACE-0-0.01dum-5Clients-5242880": 1078837.0,
+        "PRIV_KIST-LAPLACE-0-0.1dum-5Clients-5242880": 1041532.65
+    },
+    "total_time": {
+        "PRIV_KIST-LAPLACE-0-0dum-5Clients-5242880": 0.11128584999999999,
+        "PRIV_KIST-LAPLACE-0-0.01dum-5Clients-5242880": 0.09704789999999999,
+        "PRIV_KIST-LAPLACE-0-0.1dum-5Clients-5242880": 0.10153559999999999
+    },
+    "jitter": {
+        "PRIV_KIST-LAPLACE-0-0dum-5Clients-5242880": 0.09198187733337908,
+        "PRIV_KIST-LAPLACE-0-0.01dum-5Clients-5242880": 0.09790550831049809,
+        "PRIV_KIST-LAPLACE-0-0.1dum-5Clients-5242880": 0.07321661222683319
+    }
 }

@@ -1,1 +1,257 @@
-{}
+{
+    "PRIV_KIST-LAPLACE-0-0dum-5Clients-5242880": {
+        "name": "PRIV_KIST-LAPLACE-0-0dum-5Clients-5242880",
+        "file_size": "5242880",
+        "tor_params": {
+            "dummy": "0",
+            "max_jitter": "10",
+            "min_jitter": "1",
+            "target_jitter": "2",
+            "dp_distribution": "LAPLACE",
+            "dp_epsilon": "0",
+            "scheduler": "PRIV_KIST"
+        },
+        "client_params": {
+            "bulk_clients": 0,
+            "web_clients": 5,
+            "top_web_clients": 0
+        },
+        "latency": {
+            "mean": 0.08644705,
+            "min": 0.078981,
+            "max": 0.112819,
+            "stddev": 0.008917031784596264,
+            "median": 0.083048
+        },
+        "throughput": {
+            "mean": 953988.9,
+            "min": 663607.0,
+            "max": 1204592.0,
+            "stddev": 180378.70373963218,
+            "median": 885348.0
+        },
+        "jitter": {
+            "mean": 0.09198187733337908,
+            "min": 0.0,
+            "max": 11.003949880599976,
+            "stddev": 0.4470797209957906,
+            "variance": 0.19988027692567395
+        },
+        "latency_p": {
+            "25th": 0.08073975,
+            "50th": 0.083048,
+            "75th": 0.0859955,
+            "90th": 0.0993831,
+            "95th": 0.10520285000000001,
+            "99th": 0.11129576999999999
+        },
+        "throughput_p": {
+            "25th": 788316.0,
+            "50th": 885348.0,
+            "75th": 1143257.25,
+            "90th": 1181844.6,
+            "95th": 1186689.25,
+            "99th": 1201011.45
+        },
+        "total_time_p": {
+            "25th": 0.08956875,
+            "50th": 0.1158165,
+            "75th": 0.129897,
+            "90th": 0.1306889,
+            "95th": 0.13189465,
+            "99th": 0.14982532999999998
+        },
+        "total_time": {
+            "mean": 0.11128584999999999,
+            "min": 0.085008,
+            "max": 0.154308,
+            "stddev": 0.02104640887722891,
+            "median": 0.1158165
+        },
+        "total_packets": {
+            "mean": 1933.0,
+            "min": 1933.0,
+            "max": 1933.0
+        },
+        "total_dummies": {
+            "mean": 2191.0,
+            "min": 2191.0,
+            "max": 2191.0
+        },
+        "total_cells": {
+            "mean": 8989.0,
+            "min": 8989.0,
+            "max": 8989.0
+        }
+    },
+    "PRIV_KIST-LAPLACE-0-0.01dum-5Clients-5242880": {
+        "name": "PRIV_KIST-LAPLACE-0-0.01dum-5Clients-5242880",
+        "file_size": "5242880",
+        "tor_params": {
+            "dummy": "0.01",
+            "max_jitter": "10",
+            "min_jitter": "1",
+            "target_jitter": "2",
+            "dp_distribution": "LAPLACE",
+            "dp_epsilon": "0",
+            "scheduler": "PRIV_KIST"
+        },
+        "client_params": {
+            "bulk_clients": 0,
+            "web_clients": 5,
+            "top_web_clients": 0
+        },
+        "latency": {
+            "mean": 0.08303109999999998,
+            "min": 0.078832,
+            "max": 0.087743,
+            "stddev": 0.0024861892908626254,
+            "median": 0.08344
+        },
+        "throughput": {
+            "mean": 1078837.0,
+            "min": 785119.0,
+            "max": 1225642.0,
+            "stddev": 145076.3233308592,
+            "median": 1147723.5
+        },
+        "jitter": {
+            "mean": 0.09790550831049809,
+            "min": 0.0,
+            "max": 9.11464548110962,
+            "stddev": 0.3971520041767471,
+            "variance": 0.15772971442160696
+        },
+        "latency_p": {
+            "25th": 0.08131125,
+            "50th": 0.08344,
+            "75th": 0.08439250000000001,
+            "90th": 0.086385,
+            "95th": 0.08655550000000001,
+            "99th": 0.0875055
+        },
+        "throughput_p": {
+            "25th": 1078246.0,
+            "50th": 1147723.5,
+            "75th": 1157869.0,
+            "90th": 1186432.1,
+            "95th": 1223277.45,
+            "99th": 1225169.09
+        },
+        "total_time_p": {
+            "25th": 0.088439,
+            "50th": 0.08922050000000001,
+            "75th": 0.0949715,
+            "90th": 0.1273794,
+            "95th": 0.1295102,
+            "99th": 0.13024284
+        },
+        "total_time": {
+            "mean": 0.09704789999999999,
+            "min": 0.083548,
+            "max": 0.130426,
+            "stddev": 0.01589404589115056,
+            "median": 0.08922050000000001
+        },
+        "total_packets": {
+            "mean": 1864.0,
+            "min": 1864.0,
+            "max": 1864.0
+        },
+        "total_dummies": {
+            "mean": 2176.0,
+            "min": 2176.0,
+            "max": 2176.0
+        },
+        "total_cells": {
+            "mean": 8966.0,
+            "min": 8966.0,
+            "max": 8966.0
+        }
+    },
+    "PRIV_KIST-LAPLACE-0-0.1dum-5Clients-5242880": {
+        "name": "PRIV_KIST-LAPLACE-0-0.1dum-5Clients-5242880",
+        "file_size": "5242880",
+        "tor_params": {
+            "dummy": "0.1",
+            "max_jitter": "10",
+            "min_jitter": "1",
+            "target_jitter": "2",
+            "dp_distribution": "LAPLACE",
+            "dp_epsilon": "0",
+            "scheduler": "PRIV_KIST"
+        },
+        "client_params": {
+            "bulk_clients": 0,
+            "web_clients": 5,
+            "top_web_clients": 0
+        },
+        "latency": {
+            "mean": 0.08323685,
+            "min": 0.079099,
+            "max": 0.121326,
+            "stddev": 0.009077023847467848,
+            "median": 0.08041899999999999
+        },
+        "throughput": {
+            "mean": 1041532.65,
+            "min": 777884.0,
+            "max": 1206764.0,
+            "stddev": 176281.7051963348,
+            "median": 1148927.0
+        },
+        "jitter": {
+            "mean": 0.07321661222683319,
+            "min": 0.0,
+            "max": 13.978995323181152,
+            "stddev": 0.40895300491547915,
+            "variance": 0.16724256022939993
+        },
+        "latency_p": {
+            "25th": 0.07982025,
+            "50th": 0.08041899999999999,
+            "75th": 0.08195975,
+            "90th": 0.08537520000000001,
+            "95th": 0.09161190000000002,
+            "99th": 0.11538317999999996
+        },
+        "throughput_p": {
+            "25th": 813772.25,
+            "50th": 1148927.0,
+            "75th": 1184504.75,
+            "90th": 1196868.5,
+            "95th": 1201599.8,
+            "99th": 1205731.16
+        },
+        "total_time_p": {
+            "25th": 0.086451,
+            "50th": 0.089144,
+            "75th": 0.125834,
+            "90th": 0.1278299,
+            "95th": 0.1282589,
+            "99th": 0.13096298
+        },
+        "total_time": {
+            "mean": 0.10153559999999999,
+            "min": 0.084855,
+            "max": 0.131639,
+            "stddev": 0.01904432523981882,
+            "median": 0.089144
+        },
+        "total_packets": {
+            "mean": 2699.0,
+            "min": 2699.0,
+            "max": 2699.0
+        },
+        "total_dummies": {
+            "mean": 3731.0,
+            "min": 3731.0,
+            "max": 3731.0
+        },
+        "total_cells": {
+            "mean": 15017.0,
+            "min": 15017.0,
+            "max": 15017.0
+        }
+    }
+}

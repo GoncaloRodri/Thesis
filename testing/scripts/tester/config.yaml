@@ -1,23 +1,19 @@
 config:
-  absolute_path: /home/guga/experiments/Thesis
+  absolute_path: /home/guga/Documents/Thesis
   repeat: 1
   copy_logs: true
   logs_dir: testing/logs/
   docker_dir: testing/docker/
   data_dir: testing/data/
   configuration_dir: testing/configuration/
-  top_website_path: testing/resources/websites.txt
+  top_website_path: testing/resources/mini.websites.txt
   clients: 9000
+  end_test_at: 120
 
 combinations:
-  tcpdump: false
-  #filesize: ["51200", "1048576", "5242880"]
   filesize: ["5242880"]
-  end_test_at: 120
   clients:
-    # [Bulk Clients, Web Clients, Top Web Clients]
     - [0, 5, 0]
-
   tor:
     dummy: [0, 0.01, 0.1]
     max_jitter: [10]

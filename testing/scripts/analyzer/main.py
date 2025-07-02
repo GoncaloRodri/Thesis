@@ -17,7 +17,7 @@ def resolve_files(test_path):
     info_path = os.path.join(test_path, "info.json")
     if os.path.isfile(info_path):
         with open(info_path, "r") as f:
-            info = json.load(f)  #! WILL CRASH LOUDLY
+            info = json.load(f)  # ! WILL CRASH LOUDLY
 
     curl_path = os.path.join(test_path, "curl.log")
     if os.path.isfile(curl_path):
@@ -96,6 +96,7 @@ def merge_data(test_data):
 
     return merged_data
 
+
 def resume_results_per_test(results):
     return {
         test_name: {
@@ -106,6 +107,7 @@ def resume_results_per_test(results):
         }
         for test_name, test_results in results.items()
     }
+
 
 def resume_results_per_metric(results):
     latency = {}

@@ -76,7 +76,7 @@ launch_localclients() {
     local name="$1"
     local filesize="$2"
     local test_count="$3"
-    log_file_path="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}/curl/${name}-${test_count}/curl.log"
+    log_file_path=$(get_logfile)
     run_localclient "$log_file_path" "$filesize"
 }
 
@@ -94,26 +94,22 @@ run_topwebclient() {
             log_error "run_topwebclient()" "URL is empty, skipping..."
             continue
         fi
-        start_tcpdump "$client_id" "$url" "$tcpdump_mode"
+        start_tcpdump "$client_id" "$url"
         exec_curl "$url" "$client_id" "$name-$test_count" "$test_count"
-        stop_tcpdump "${tcpdump_mode}"
+        stop_tcpdump
     done
 }
 
 start_tcpdump() {
-    if [[ "$3" ]]; then
-        for container in "${CONTAINERS[@]}"; do
-            start_tcpdump_on_relay "$container" "$1" "$2" &
-        done
-    fi
+    for container in "${CONTAINERS[@]}"; do
+        start_tcpdump_on_relay "$container" "$1" "$2" &
+    done
 }
 
 stop_tcpdump() {
-    if [[ "$1" ]]; then
-        for container in "${CONTAINERS[@]}"; do
-            stop_tcpdump_on_relay "$container"
-        done
-    fi
+    for container in "${CONTAINERS[@]}"; do
+        stop_tcpdump_on_relay "$container"
+    done
 }
 
 start_tcpdump_on_relay() {

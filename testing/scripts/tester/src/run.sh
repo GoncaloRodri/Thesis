@@ -44,7 +44,8 @@ run_experiment() {
 
         if [ -n "$top_web_clients" ] && [ "$top_web_clients" -gt 0 ]; then
             log_info "Starting Top Websites Clients Experiment..."
-            launch_topweb_clients "$name" "$file_size" "$ii" "$end_test_at" "$top_web_clients" "$tcpdump_mode"
+            launch_topweb_clients "$name" "$file_size" "$ii" "$end_test_at" "$top_web_clients"
+            log_info "Bulk/Web Clients Experiment Completed!"
         elif [ -n "$bulk_clients" ] && [ -n "$web_clients" ] && { [ "$bulk_clients" -gt 0 ] || [ "$web_clients" -gt 0 ]; }; then
             log_info "Starting Bulk/Web Clients Experiment..."
             launch_localclients "$name" "$file_size" "$ii"
@@ -57,7 +58,7 @@ run_experiment() {
         log_success "Performance Experiment Successful!\n"
 
         if [ "${CONFIG["copy_logs"]}" = true ]; then
-            save_logs "$name" "$ii" "$file_size" "$tor_params" "$client_params" "$tcpdump_mode"
+            save_logs "$name" "$ii" "$file_size" "$tor_params" "$client_params" "$top_web_clients"
         fi
 
     done
@@ -70,15 +71,15 @@ save_logs() {
 
     mkdir -p "${copy_dir}"
     # Copy cURL logs
-    cp -r "${logs_dir}/curl/" "${copy_dir}/curl"
-    rm -rf "${logs_dir}/curl/*" || log_fatal "Failed to clean cURL logs directory: ${logs_dir}/curl"
+    cp -r "${logs_dir}curl.log" "${copy_dir}"
+    rm -rf "${logs_dir}curl.log" || log_fatal "Failed to clean cURL logs directory: ${logs_dir}curl.log"
 
     # Copy Tor logs
     mkdir -p "${copy_dir}/tor"
     cp -r "${logs_dir}tor" "${copy_dir}"
 
     # Copy pcap logs
-    if [ "$6" == "true" ]; then
+    if [ "$6" -gt 0 ]; then
         zip -r "${copy_dir}/$1.zip" "${logs_dir}wireshark/" || log_fatal "Failed to zip pcap logs"
     fi
 
@@ -93,7 +94,6 @@ save_logs() {
 }
 
 run_combinations() {
-    END_TEST_AT=$(echo "$COMBINATIONS" | jq '.end_test_at')
     TCP_DUMP_MODE=$(echo "$COMBINATIONS" | jq '.tcpdump')
 
     FILESIZE_LIST=$(echo "$COMBINATIONS" | jq '.filesize')
@@ -152,7 +152,7 @@ run_combinations() {
                                         #SCHED - DIST - EPSILON - DUMMY - CLIENT_RATIO - FILESIZE
                                         totalC="$(echo "$CLIENTS_LIST" | jq -r ".[$i][0] + .[$i][1] + .[$i][2]")"
                                         name="$(echo "$SCHEDULER_LIST" | jq -r ".[$p]")-$(echo "$DP_DIST_LIST" | jq -r ".[$n]")-$(echo "$DP_EPSILON_LIST" | jq -r ".[$o]")-$(echo "$DUMMY_LIST" | jq -r ".[$j]")dum-${totalC}Clients-$file_size"
-                                        run_experiment "$name" "$TCP_DUMP_MODE" "$file_size" "$END_TEST_AT" "$client_params" "$tor_params"
+                                        run_experiment "$name" "$TCP_DUMP_MODE" "$file_size" ""${CONFIG["end_test_at"]}"" "$client_params" "$tor_params"
                                     done
                                 done
                             done

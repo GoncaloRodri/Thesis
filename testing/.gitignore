@@ -3,8 +3,15 @@ tmp
 scripts/ploter/*.png
 scripts/ploter/**/*.png
 
+results/**/*.png
+data
+
 # Ignore Python cache files
 __pycache__
 *.pyc
 *.pyo
 *.pyd
+
+# Ignore virtual environments
+venv
+.env
