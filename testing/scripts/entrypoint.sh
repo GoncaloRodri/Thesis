@@ -20,4 +20,6 @@ cd /app/tor || exit 1
 sed -i "s/^Address .*/Address $(hostname -i)/" /app/conf/tor.common.torrc
 sed -i "s/^Nickname .*/Nickname $NAME/" /app/conf/tor.common.torrc
 
+cat /app/conf/tor.common.torrc 
+
 (tor -f /app/tor/torrc) | tee /app/logs/tor/"$NAME".tor.log

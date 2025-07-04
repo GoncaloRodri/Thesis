@@ -57,7 +57,7 @@ run_localclient() {
     local url
     local log_file="$1"
     local filesize="$2"
-    CURL_TEST_NUM=20
+    CURL_TEST_NUM="${CONFIG["end_test_at"]}"
 
     url=$(get_url "$filesize")
     for ((curl_i = 0; curl_i < $((CURL_TEST_NUM)); curl_i++)); do
