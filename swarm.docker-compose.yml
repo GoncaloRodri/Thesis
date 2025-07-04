@@ -1,0 +1,43 @@
+services: 
+  authority:
+      image: gugarodri/dptor_node:latest
+      volumes:
+        - ./testing/configuration/:/app/conf/
+        - ./testing/logs:/app/logs/
+      environment:
+        - NAME=authority
+        - RELAY_TYPE=authority
+      deploy:
+        replicas: 1
+      networks:
+        - swarm
+
+  relay:
+      image: gugarodri/dptor_node:latest
+      volumes:
+        - ./testing/configuration/:/app/conf/
+        - ./testing/logs/:/app/logs/
+      environment:
+        - RELAY_TYPE=relay
+      hostname: "relay-{{.Task.Slot}}" # TODO: VERIFY THIS
+      deploy:
+        replicas: 3
+      networks:
+        - swarm
+
+  exit:
+      image: gugarodri/dptor_node:latest
+      volumes:
+        - ./testing/configuration/:/app/conf/
+        - ./testing/logs/:/app/logs/
+      environment:
+        - RELAY_TYPE=exit
+      hostname: "exit-{{.Task.Slot}}" # TODO: VERIFY THIS
+      deploy:
+        replicas: 1
+      networks:
+        - swarm
+
+networks:
+  swarm:
+    driver: overlay
