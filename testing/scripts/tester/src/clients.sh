@@ -96,6 +96,7 @@ run_topwebclient() {
         fi
         start_tcpdump "$client_id" "$url"
         exec_curl "$url" "$client_id" "$name-$test_count" "$test_count"
+        echo -ne "⚠️ \e[33mExecuting Curl Request [${url}]                   \e[0m"\\r
         stop_tcpdump
     done
 }

@@ -71,9 +71,10 @@ save_logs() {
 
     mkdir -p "${copy_dir}"
     # Copy cURL logs
-    cp -r "${logs_dir}curl.log" "${copy_dir}"
-    rm -rf "${logs_dir}curl.log" || log_fatal "Failed to clean cURL logs directory: ${logs_dir}curl.log"
-
+    if [ "$6" -le 0 ]; then
+        cp -r "${logs_dir}curl.log" "${copy_dir}"
+        rm -rf "${logs_dir}curl.log" || log_fatal "Failed to clean cURL logs directory: ${logs_dir}curl.log"
+    fi
     # Copy Tor logs
     mkdir -p "${copy_dir}/tor"
     cp -r "${logs_dir}tor" "${copy_dir}"
