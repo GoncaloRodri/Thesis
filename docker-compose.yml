@@ -2,7 +2,7 @@ services:
   authority:
     image: dptor_node
     volumes:
-      - ./testing/configuration/:/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs:/app/logs/
     environment:
       - NAME=authority
@@ -14,7 +14,7 @@ services:
   relay1:
     image: dptor_node
     volumes:
-      - ./testing/configuration/:/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay1
@@ -26,7 +26,7 @@ services:
   relay2:
     image: dptor_node
     volumes:
-      - ./testing/configuration/:/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay2
@@ -38,7 +38,7 @@ services:
   exit1:
     image: dptor_node
     volumes:
-      - ./testing/configuration/:/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=exit1
@@ -52,7 +52,7 @@ services:
     ports:
       - 9000:9000
     volumes:
-      - ./testing/configuration/:/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=client1
