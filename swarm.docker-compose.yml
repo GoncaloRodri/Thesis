@@ -5,12 +5,10 @@ services:
         - ./testing/configuration/:/app/conf/
         - ./testing/logs:/app/logs/
       environment:
-        - NAME=authority
         - RELAY_TYPE=authority
+      hostname: "authority"
       deploy:
         replicas: 1
-      networks:
-        - swarm
 
   relay:
       image: gugarodri/dptor_node:latest
@@ -19,9 +17,9 @@ services:
         - ./testing/logs/:/app/logs/
       environment:
         - RELAY_TYPE=relay
-      hostname: "relay-{{.Task.Slot}}" # TODO: VERIFY THIS
+      hostname: "relay-{{.Task.Slot}}"
       deploy:
-        replicas: 3
+        replicas: 2
       networks:
         - swarm
 
@@ -32,7 +30,7 @@ services:
         - ./testing/logs/:/app/logs/
       environment:
         - RELAY_TYPE=exit
-      hostname: "exit-{{.Task.Slot}}" # TODO: VERIFY THIS
+      hostname: "exit-{{.Task.Slot}}"
       deploy:
         replicas: 1
       networks:

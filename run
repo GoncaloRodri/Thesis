@@ -7,9 +7,10 @@ case "$1" in
     ;;
 "b" | "build")
     docker buildx build \
-        -t dptor_node \
+        -t gugarodri/dptor_node:latest \
         -f testing/docker/node.Dockerfile \
         .
+    docker push gugarodri/dptor_node:latest
     exit 0
     ;;
 "a" | "analyze")
@@ -35,6 +36,11 @@ case "$1" in
 "c" | "config")
     nano testing/scripts/tester/config.yaml
     exit 0
+    ;;
+"s" | "swarm")
+    docker swarm leave --force
+    docker swarm init --advertise-addr 127.0.0.1
+    docker stack deploy --detach=false -c swarm.docker-compose.yml test
     ;;
 *)
     echo "Invalid option: $1"
