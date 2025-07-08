@@ -38,9 +38,8 @@ case "$1" in
     exit 0
     ;;
 "s" | "swarm")
-    docker swarm leave --force
-    docker swarm init --advertise-addr 127.0.0.1
-    docker stack deploy --detach=false -c swarm.docker-compose.yml test
+    sh -c "./testing/scripts/tester/swarm.sh"
+    exit 0
     ;;
 *)
     echo "Invalid option: $1"

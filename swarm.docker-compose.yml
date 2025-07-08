@@ -21,7 +21,7 @@ services:
         - RELAY_TYPE=relay
       hostname: "relay-{{.Task.Slot}}"
       deploy:
-        replicas: 10
+        replicas: 5
       networks:
         - swarm
       depends_on:
@@ -56,6 +56,9 @@ services:
       - swarm
     depends_on:
     - authority
+    ports:
+      - "9000:9000"
+
 networks:
   swarm:
     driver: overlay
