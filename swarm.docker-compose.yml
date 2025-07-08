@@ -9,6 +9,8 @@ services:
       hostname: "authority"
       deploy:
         replicas: 1
+      networks:
+        - swarm
 
   relay:
       image: gugarodri/dptor_node:latest
@@ -19,9 +21,11 @@ services:
         - RELAY_TYPE=relay
       hostname: "relay-{{.Task.Slot}}"
       deploy:
-        replicas: 2
+        replicas: 10
       networks:
         - swarm
+      depends_on:
+      - authority
 
   exit:
       image: gugarodri/dptor_node:latest
@@ -32,10 +36,26 @@ services:
         - RELAY_TYPE=exit
       hostname: "exit-{{.Task.Slot}}"
       deploy:
-        replicas: 1
+        replicas: 3
       networks:
         - swarm
-
+      depends_on:
+      - authority
+  
+  client:
+    image: gugarodri/dptor_node:latest
+    volumes:
+      - ./testing/configuration/:/app/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - RELAY_TYPE=client
+    hostname: "client-{{.Task.Slot}}"
+    deploy:
+      replicas: 1
+    networks:
+      - swarm
+    depends_on:
+    - authority
 networks:
   swarm:
     driver: overlay
