@@ -36,12 +36,13 @@ filesizes = df["filesize"].unique()
 metrics = [
     "jitter",
     "total_packets",
+    "total_dummies",
     "latency_50",
     "throughput_50",
     "total_time_50",
-    # "latency_95",
-    # "throughput_95",
-    # "total_time_95",
+    "latency_95",
+    "throughput_95",
+    "total_time_95",
     "latency",
     "throughput",
     "total_time",
@@ -51,46 +52,18 @@ metrics = [
 distributions = df["distribution"].unique()
 schedulers = df["scheduler"].unique()
 
-print("Filesizes:", filesizes)
-print("Metrics:", metrics)
-print("Distributions:", distributions)
-print("Schedulers:", schedulers)
+plotter.plot_dummy_count(df, SHOW)
 
-# # Only Dummy (Distribution is irrelevant)
 for metric in metrics:
     for filesize in filesizes:
-        print(f"Plotting {metric} for filesize {filesize}...")
+        plotter.plot_jitter(metric, filesize, df, SHOW)
+        plotter.plot_jitter_dummy(metric, filesize, df, SHOW)
         plotter.plot_dummy(metric, filesize, df, SHOW)
-
-# # Only Jitter (One plot for each distribution)
-for metric in metrics:
-    for filesize in filesizes:
         for dist in distributions:
             if dist == "CONTROL":
                 continue
             plotter.plot_jitter_by_distribution(metric, dist, filesize, df, SHOW)
 
-# Only Jitter (Distributions in the same plot, fixed epsilon [0 & max])
-min_eps = df["epsilon"].min()
-max_eps = df["epsilon"].max()
-accepted_eps = [min_eps, max_eps]
-
-for metric in metrics:
-    for filesize in filesizes:
-        plotter.plot_jitter(metric, filesize, df, accepted_eps, SHOW)
-
-
-# Jitter + Dummy Side by Side (Max & Min Dummy + Max & Min Epsilon)
-# min_dummy = df["dummy"].min()
-# max_dummy = df["dummy"].max()
-# accepted_dummy = [min_dummy, max_dummy]
-
-# for metric in metrics:
-#     for filesize in filesizes:
-#         plotter.plot_jitter_dummy(
-#             metric, filesize, df, accepted_dummy, accepted_eps, True
-#         )
-plotter.plot_dummy_count(df, SHOW)
 
 print("Plots generated successfully.")
 exit(0)
