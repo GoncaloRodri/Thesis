@@ -2,7 +2,7 @@ services:
   authority:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs:/app/logs/
     environment:
       - NAME=authority
@@ -14,7 +14,7 @@ services:
   relay1:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay1
@@ -26,7 +26,7 @@ services:
   relay2:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay2
@@ -38,7 +38,7 @@ services:
   relay3:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay3
@@ -50,7 +50,7 @@ services:
   relay4:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay4
@@ -62,7 +62,7 @@ services:
   relay5:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay5
@@ -74,7 +74,7 @@ services:
   relay6:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay6
@@ -86,7 +86,7 @@ services:
   relay7:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay7
@@ -98,7 +98,7 @@ services:
   relay8:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay8
@@ -110,7 +110,7 @@ services:
   relay9:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay9
@@ -122,7 +122,7 @@ services:
   relay10:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay10
@@ -134,7 +134,7 @@ services:
   relay11:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay11
@@ -146,7 +146,7 @@ services:
   relay12:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay12
@@ -159,7 +159,7 @@ services:
   exit1:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=exit1
@@ -170,7 +170,7 @@ services:
   exit2:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=exit2
@@ -181,7 +181,7 @@ services:
   exit3:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=exit3
@@ -193,7 +193,7 @@ services:
   exit4:
     image: dptor_node
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=exit4
@@ -207,7 +207,7 @@ services:
     ports:
       - 9000:9000
     volumes:
-      - ./configuration/:/app/conf/
+      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=client1

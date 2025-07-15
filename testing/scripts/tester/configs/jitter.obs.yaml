@@ -11,18 +11,15 @@ config:
   end_test_at: 100
 
 combinations:
-  filesize: ["5242880"]
+  filesize: ["1"]
   clients:
-    - [0, 1, 0]
+    - [0, 0, 1]
   tor:
-    dummy: [0, 0.1, 0.5, 1, 2.5, 5]
-    #dummy: [-1]
+    dummy: [-1]
     max_jitter: [10]
     min_jitter: [1]
     target_jitter: [2]
-    dp_distribution: ["LAPLACE", "POISSON"]
-    #dp_distribution: ["LAPLACE"]
-    dp_epsilon: [0, 0.1, 0.5, 1, 2.5, 5]
-    #dp_epsilon: [7.5]
-    #scheduler: ["KIST"] # "PRIV_Vanilla"
-    scheduler: ["PRIV_KIST"]
+    dp_distribution: ["LAPLACE", "POISSON", "EXPONENTIAL"]
+    dp_epsilon: [0, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+
+    scheduler: ["PRIV_KIST", "PRIV_Vanilla"]

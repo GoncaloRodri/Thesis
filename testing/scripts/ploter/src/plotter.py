@@ -156,9 +156,51 @@ def plot_dummy_count(data, show=False):
     for (sched, eps, file_size, dist), group in data.groupby(
         ["scheduler", "epsilon", "filesize", "distribution"]
     ):
+
         if float(eps) >= 0:
             continue
 
+        print(group)
+        filtered_group = group[group["dummy"] >= 0]
+        group_sorted = filtered_group.sort_values("dummy")
+
+        __plot(
+            ax,
+            group_sorted["dummy"],
+            group_sorted["total_dummies"],
+            sched,
+            label=f"{sched}",
+        )
+
+    if __draw_ax(
+        ax,
+        "Packet Generation Epsilon",
+        f"Total False Cells ({get_file_sizes(file_size)})",
+        "dummy_count",
+        file_size,
+    ):
+        print(f"No data to plot for dummy count with file size {file_size}")
+        return
+
+    __save_fig(
+        fig,
+        "dummy_count",
+        file_size,
+        "dummy_count",
+        show,
+    )
+
+
+def plot_dummy_ratio(data, show=False):
+    fig, ax = plt.subplots()
+    for (sched, eps, file_size, dist), group in data.groupby(
+        ["scheduler", "epsilon", "filesize", "distribution"]
+    ):
+
+        if float(eps) >= 0:
+            continue
+
+        print(group)
         filtered_group = group[group["dummy"] >= 0]
         group_sorted = filtered_group.sort_values("dummy")
 
@@ -179,6 +221,46 @@ def plot_dummy_count(data, show=False):
         ax,
         "Packet Generation Epsilon",
         f"Total Cells vs Cell Generation Epsilon ({get_file_sizes(file_size)})",
+        "dummy_ratio",
+        file_size,
+    ):
+        print(f"No data to plot for dummy count with file size {file_size}")
+        return
+
+    __save_fig(
+        fig,
+        "dummy_ratio",
+        file_size,
+        "dummy_ratio",
+        show,
+    )
+
+
+def plot_packet_count(data, show=False):
+    fig, ax = plt.subplots()
+    for (sched, eps, file_size, dist), group in data.groupby(
+        ["scheduler", "epsilon", "filesize", "distribution"]
+    ):
+
+        if float(eps) >= 0:
+            continue
+
+        print(group)
+        filtered_group = group[group["dummy"] >= 0]
+        group_sorted = filtered_group.sort_values("dummy")
+
+        __plot(
+            ax,
+            group_sorted["dummy"],
+            group_sorted["total_packets"],
+            sched,
+            label=f"{sched} | {dist.capitalize()} | {get_file_sizes(file_size)}",
+        )
+
+    if __draw_ax(
+        ax,
+        "Packet Generation Epsilon",
+        f"TLS Packet Count ({get_file_sizes(file_size)})",
         "dummy_count",
         file_size,
     ):
@@ -187,10 +269,10 @@ def plot_dummy_count(data, show=False):
 
     __save_fig(
         fig,
-        "dummy_count",
+        "packet_count",
         file_size,
-        "dummy_count",
-        show=show,
+        "packet_count",
+        show,
     )
 
 
@@ -232,7 +314,6 @@ def __save_fig(fig, metric, file_size, file_name, show=False):
     """
     Helper function to save the figure with common settings.
     """
-    fig.tight_layout()
     path = f"{abs_path()}/{metric}"
     os.makedirs(path, exist_ok=True)
     fig.savefig(
@@ -307,9 +388,9 @@ def get_units(metric):
 def get_file_sizes(size):
     if size == "51200":
         return "50 KiB"
-    elif size == "1048575":
+    elif size == "1048576":
         return "1 MiB"
-    elif size == "655360":
+    elif size == "5242880":
         return "5 MiB"
     else:
         return size

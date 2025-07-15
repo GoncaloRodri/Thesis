@@ -35,8 +35,6 @@ df["total_time_25"] = pd.to_numeric(df["total_time_25"], errors="coerce")
 filesizes = df["filesize"].unique()
 metrics = [
     "jitter",
-    "total_packets",
-    "total_dummies",
     "latency_50",
     "throughput_50",
     "total_time_50",
@@ -53,6 +51,8 @@ distributions = df["distribution"].unique()
 schedulers = df["scheduler"].unique()
 
 plotter.plot_dummy_count(df, SHOW)
+plotter.plot_dummy_ratio(df, SHOW)
+plotter.plot_packet_count(df, SHOW)
 
 for metric in metrics:
     for filesize in filesizes:
