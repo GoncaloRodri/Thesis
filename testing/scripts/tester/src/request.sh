@@ -14,7 +14,7 @@ exec_curl() {
 }
 get_url() {
     #echo "http://ipv4.download.thinkbroadband.com/${1}.zip"
-    echo "10.5.0.200:80/bytes/${1}"
+    echo "10.5.0.200:5000/bytes/${1}"
 }
 
 get_logfile() {
@@ -47,7 +47,7 @@ run_bulkclient() {
     local counter=0
     while true; do
         counter=$((counter + 1))
-        exec_curl "$url" "$log_file"
+        exec_curl "$url" "$(get_logfile)"
         ((bulkcount++))
         sleep 0.5
     done
@@ -61,9 +61,8 @@ run_localclient() {
 
     url=$(get_url "$filesize")
     for ((curl_i = 0; curl_i < $((CURL_TEST_NUM)); curl_i++)); do
-        exec_curl "$url" "$log_file"
-        ratio=$(((curl_i + 1) * 100 / CURL_TEST_NUM))
-        echo -ne "⚠️ \e[33mExecuting Curl Requests [${ratio}%]\e[0m"\\r
+        exec_curl "$url" "$(get_logfile)"
+        echo -ne "⚠️ \e[33mExecuting Curl Requests [$curl_i of $CURL_TEST_NUM]\e[0m"\\r
         sleep 1
     done
     echo -ne "⚠️ \e[33mExecuting Curl Requests [100%]\e[0m"\\r

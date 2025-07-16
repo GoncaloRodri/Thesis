@@ -1,233 +1,367 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 
 
 def plot_dummy(metric, filesize, data, show=False):
-    print(data)
+    fig, ax = plt.subplots()
     for (sched, eps, file_size, dist), group in data.groupby(
         ["scheduler", "epsilon", "filesize", "distribution"]
     ):
-        if file_size != filesize:
+        if file_size != filesize or float(eps) >= 0:
             continue
-        group_sorted = group.sort_values("dummy")
-        label = (
-            f"{sched} | εS={eps} | {dist.capitalize()}"
-            if sched not in ["KIST", "Vanilla"]
-            else f"{sched} (control)"
-        )
-        print(f"Plotting {metric} for {label} with file size {file_size}")
-        print("Group sorted:")
-        print(group_sorted)
 
-        plt.plot(
-            group_sorted["dummy"],
-            group_sorted[metric],
-            marker="o",
-            label=label,
-            linestyle=get_line_style(sched),
-        )
-        if metric in ["latency_95", "throughput_95", "total_time_95"]:
-            metric_25 = metric.replace("95", "25")
-            metric_75 = metric.replace("95", "75")
-            plt.fill_between(
-                group_sorted["dummy"],
-                group_sorted[metric_25],
-                group_sorted[metric_75],
-                alpha=0.2,
-            )
+        filtered_group = group[group["dummy"] >= 0]
+        group_sorted = filtered_group.sort_values("dummy")
 
-        elif metric in ["latency_50", "throughput_50", "total_time_50"]:
-            metric_25 = metric.replace("50", "25")
-            metric_75 = metric.replace("50", "75")
-            plt.fill_between(
-                group_sorted["dummy"],
-                group_sorted[metric_25],
-                group_sorted[metric_75],
-                alpha=0.2,
-            )
+        __plot(ax, group_sorted["dummy"], group_sorted[metric], sched)
 
-        elif metric in [
-            "latency",
-            "throughput",
-            "total_time",
-        ]:
-            plt.fill_between(
-                group_sorted["dummy"],
-                group_sorted[f"{metric}_25"],
-                group_sorted[f"{metric}_75"],
-                alpha=0.2,
-            )
+        __fill_between(ax, "dummy", group_sorted, metric)
 
-    plt.title(f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})")
-    plt.xlabel("Packet Generation Epsilon")
-    plt.ylabel(get_units(metric))
-    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig(
-        f"{abs_path()}/dummy/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(" ", "_")}.png"
+    if __draw_ax(
+        ax,
+        "Dummy Epsilon",
+        f"{metric.capitalize()} vs Dummy Epsilon ({get_file_sizes(filesize)})",
+        metric,
+        filesize,
+    ):
+        return
+
+    __save_fig(
+        fig,
+        metric,
+        filesize,
+        "dummy",
+        show,
     )
-    if show:
-        plt.show()
-    plt.clf()
 
 
 def plot_jitter_by_distribution(metric, dist, filesize, data, show=False):
+    fig, ax = plt.subplots()
     for (sched, dummy, file_size, distribution), group in data.groupby(
         ["scheduler", "dummy", "filesize", "distribution"]
     ):
-        if file_size != filesize or distribution != dist != "CONTROL":
+        if (
+            file_size != filesize
+            or distribution != dist != "CONTROL"
+            or float(dummy) >= 0
+        ):
             continue
-        group_sorted = group.sort_values("epsilon")
-        label = (
-            f"{sched} | εD={dummy} | {dist.capitalize()}"
-            if sched not in ["KIST", "Vanilla"]
-            else f"{sched} (control)"
-        )
-        plt.plot(
-            group_sorted["epsilon"],
-            group_sorted[metric],
-            marker="o",
-            label=label,
-            linestyle=get_line_style(sched),
-        )
-    plt.title(
-        f"{metric.capitalize()} on {dist.capitalize()} Distribution ({get_file_sizes(filesize)})"
+
+        filtered_group = group[group["epsilon"] >= 0]
+        group_sorted = filtered_group.sort_values("epsilon")
+
+        __plot(ax, group_sorted["epsilon"], group_sorted[metric], sched)
+        __fill_between(ax, "epsilon", group_sorted, metric)
+
+    if __draw_ax(
+        ax,
+        "Jitter Induction Epsilon",
+        f"{metric.capitalize()} on {dist.capitalize()} Distribution ({get_file_sizes(filesize)})",
+        metric,
+        filesize,
+    ):
+        return
+
+    __save_fig(
+        fig,
+        metric,
+        filesize,
+        f"jitter_{dist.capitalize()}",
+        show,
     )
-    plt.xlabel("Jitter Induction Epsilon")
-    plt.ylabel(get_units(metric))
-    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig(
-        f"{abs_path()}/jitter/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(' ', '_')}_{dist}.png"
-    )
-    if show:
-        plt.show()
-    plt.clf()
 
 
-def plot_jitter(metric, filesize, data, accepted_eps, show=False):
+def plot_jitter(metric, filesize, data, show=False):
+    fig, ax = plt.subplots()
     for (sched, dummy, file_size, dist), group in data.groupby(
         ["scheduler", "dummy", "filesize", "distribution"]
     ):
-        if file_size != filesize:
+        if file_size != filesize or float(dummy) >= 0:
             continue
-        group_sorted = group.sort_values("epsilon")
-        label = (
-            f"{sched} | εD={dummy} | {dist.capitalize()}"
-            if sched not in ["KIST", "Vanilla"]
-            else f"{sched} (control)"
-        )
-
-        plt.plot(
-            group_sorted["epsilon"],
-            group_sorted[metric],
-            marker="o",
-            label=label,
-            linestyle=get_line_style(sched),
-        )
-    plt.title(f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})")
-    plt.xlabel("Jitter Induction Epsilon")
-    plt.ylabel(get_units(metric))
-    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig(
-        f"{abs_path()}/jitter/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(' ', '_')}.png"
-    )
-    if show:
-        plt.show()
-    plt.clf()
-
-
-def plot_jitter_dummy(metric, filesize, data, accepted_dummy, accepted_eps, show=False):
-    for (sched, file_size, dist), group in data.groupby(
-        ["scheduler", "filesize", "distribution"]
-    ):
-        if file_size != filesize:
-            continue
-        group_sorted = group.sort_values("dummy")
+        filtered_group = group[group["epsilon"] >= 0]
+        group_sorted = filtered_group.sort_values("epsilon")
         label = (
             f"{sched} | {dist.capitalize()}"
             if sched not in ["KIST", "Vanilla"]
-            else f"{sched} (control)"
+            else f"{sched}"
         )
 
-        plt.plot(
+        __plot(ax, group_sorted["epsilon"], group_sorted[metric], sched, label=label)
+
+    if __draw_ax(
+        ax,
+        "Jitter Induction Epsilon",
+        f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})",
+        metric,
+        filesize,
+    ):
+        return
+
+    __save_fig(
+        fig,
+        metric,
+        filesize,
+        "jitter",
+        show,
+    )
+
+
+def plot_jitter_dummy(metric, filesize, data, show=False):
+    fig, ax = plt.subplots()
+    for (sched, file_size, dist), group in data.groupby(
+        ["scheduler", "filesize", "distribution"]
+    ):
+        if file_size != filesize or dist != "LAPLACE":
+            continue
+        filtered_group = group[(group["epsilon"] >= 0) & (group["dummy"] >= 0)]
+        group_sorted = filtered_group.sort_values("epsilon")
+        label = (
+            f"{sched} | {dist.capitalize()}"
+            if sched not in ["KIST", "Vanilla"]
+            else f"{sched}"
+        )
+
+        ax.scatter(
             group_sorted["dummy"],
             group_sorted["epsilon"],
+            c=group_sorted[metric],
+            cmap="coolwarm",
+            alpha=0.7,
             marker="o",
             label=label,
             linestyle=get_line_style(sched),
         )
-    plt.title(f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})")
-    plt.xlabel("Dummy Epsilon")
-    plt.ylabel("Jitter Induction Epsilon")
-    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig(
-        f"{abs_path()}/jitter_dummy/{metric}_vs_clients_{get_file_sizes(filesize).lower().replace(' ', '_')}.png"
+
+    if not ax.collections:
+        plt.close(fig)
+        return
+
+    ax.set_title(f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})")
+    ax.set_xlabel("Dummy Epsilon")
+    ax.set_ylabel("Jitter Induction Epsilon")
+    ax.legend(bbox_to_anchor=(1.05, 1))
+    ax.grid(True)
+    __save_fig(
+        fig,
+        metric,
+        filesize,
+        f"jitter_dummy_{get_file_sizes(filesize).lower().replace(' ', '_')}",
+        show,
     )
-    if show:
-        plt.show()
-    plt.clf()
 
 
 def plot_dummy_count(data, show=False):
+    fig, ax = plt.subplots()
     for (sched, eps, file_size, dist), group in data.groupby(
         ["scheduler", "epsilon", "filesize", "distribution"]
     ):
-        group_sorted = group.sort_values("dummy")
-        label = (
-            f"{sched} | εS={eps} | {dist.capitalize()}"
-            if sched not in ["KIST", "Vanilla"]
-            else f"{sched} (control)"
-        )
-        plt.plot(
+
+        if float(eps) >= 0:
+            continue
+
+        print(group)
+        filtered_group = group[group["dummy"] >= 0]
+        group_sorted = filtered_group.sort_values("dummy")
+
+        __plot(
+            ax,
             group_sorted["dummy"],
             group_sorted["total_dummies"],
-            marker="o",
-            label=f"{label} (Total Dummies)",
-            linestyle=get_line_style(sched),
+            sched,
+            label=f"{sched}",
         )
-        plt.plot(
-            group_sorted["dummy"],
-            group_sorted["total_cells"],
-            marker="x",
-            label=f"{label} (Total Cells)",
-            linestyle=get_line_style(sched),
-        )
-        plt.plot(
+
+    if __draw_ax(
+        ax,
+        "Packet Generation Epsilon",
+        f"Total False Cells ({get_file_sizes(file_size)})",
+        "dummy_count",
+        file_size,
+    ):
+        print(f"No data to plot for dummy count with file size {file_size}")
+        return
+
+    __save_fig(
+        fig,
+        "dummy_count",
+        file_size,
+        "dummy_count",
+        show,
+    )
+
+
+def plot_dummy_ratio(data, show=False):
+    fig, ax = plt.subplots()
+    for (sched, eps, file_size, dist), group in data.groupby(
+        ["scheduler", "epsilon", "filesize", "distribution"]
+    ):
+
+        if float(eps) >= 0:
+            continue
+
+        print(group)
+        filtered_group = group[group["dummy"] >= 0]
+        group_sorted = filtered_group.sort_values("dummy")
+
+        __plot(
+            ax,
             group_sorted["dummy"],
             [
-                d / cell
+                d / (cell)
                 for d, cell in zip(
                     group_sorted["total_dummies"], group_sorted["total_cells"]
                 )
             ],
-            marker="s",
-            label=f"{label} (Dummies/Cells Ratio)",
-            linestyle=get_line_style(sched),
+            sched,
+            label=f"{sched} (Dummies/Cells Ratio)",
         )
-    plt.title(f"Total Cells vs Cell Generation Epsilon ({get_file_sizes(file_size)})")
-    plt.xlabel("Packet Generation Epsilon")
-    plt.ylabel("Total Cells")
-    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig(
-        f"{abs_path()}/dummy_count/dummies_vs_cells_{get_file_sizes(file_size).lower().replace(' ', '_')}.png"
+
+    if __draw_ax(
+        ax,
+        "Packet Generation Epsilon",
+        f"Total Cells vs Cell Generation Epsilon ({get_file_sizes(file_size)})",
+        "dummy_ratio",
+        file_size,
+    ):
+        print(f"No data to plot for dummy count with file size {file_size}")
+        return
+
+    __save_fig(
+        fig,
+        "dummy_ratio",
+        file_size,
+        "dummy_ratio",
+        show,
     )
-    if show:
-        plt.show()
-    plt.clf()
+
+
+def plot_packet_count(data, show=False):
+    fig, ax = plt.subplots()
+    for (sched, eps, file_size, dist), group in data.groupby(
+        ["scheduler", "epsilon", "filesize", "distribution"]
+    ):
+
+        if float(eps) >= 0:
+            continue
+
+        print(group)
+        filtered_group = group[group["dummy"] >= 0]
+        group_sorted = filtered_group.sort_values("dummy")
+
+        __plot(
+            ax,
+            group_sorted["dummy"],
+            group_sorted["total_packets"],
+            sched,
+            label=f"{sched} | {dist.capitalize()} | {get_file_sizes(file_size)}",
+        )
+
+    if __draw_ax(
+        ax,
+        "Packet Generation Epsilon",
+        f"TLS Packet Count ({get_file_sizes(file_size)})",
+        "dummy_count",
+        file_size,
+    ):
+        print(f"No data to plot for dummy count with file size {file_size}")
+        return
+
+    __save_fig(
+        fig,
+        "packet_count",
+        file_size,
+        "packet_count",
+        show,
+    )
 
 
 ########################################
 # Helpers
 ########################################
+
+
+def __plot(ax, x, y, sched, label=None):
+    """
+    Helper function to plot data with common settings.
+    """
+    ax.plot(
+        x,
+        y,
+        marker="o",
+        label=label if label else f"{sched}",
+        linestyle=get_line_style(sched),
+    )
+
+
+def __draw_ax(ax, x_label, title, metric, file_size):
+    """
+    Helper function to finalize the plot with common settings.
+    """
+    if not ax.lines:
+        plt.close("all")
+        return True
+
+    ax.set_title(title)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(get_units(metric))
+    ax.legend(bbox_to_anchor=(1.05, 1))
+    ax.grid(True)
+    return False
+
+
+def __save_fig(fig, metric, file_size, file_name, show=False):
+    """
+    Helper function to save the figure with common settings.
+    """
+    path = f"{abs_path()}/{metric}"
+    os.makedirs(path, exist_ok=True)
+    fig.savefig(
+        f"{path}/{file_name}_{get_file_sizes(file_size).lower().replace(' ', '_')}.png"
+    )
+    if show:
+        fig.show()
+    plt.close("all")
+
+
+def __fill_between(ax, variable, group_sorted, metric):
+    """
+    Helper function to fill the area between two percentiles.
+    """
+
+    print(f"Filling between for metric: {metric}")
+
+    if metric not in [
+        "latency",
+        "throughput",
+        "total_time",
+        "latency_50",
+        "throughput_50",
+        "total_time_50",
+        "latency_95",
+        "throughput_95",
+        "total_time_95",
+    ]:
+        return
+
+    if "_95" in metric:
+        metric_25 = metric.replace("95", "25")
+        metric_75 = metric.replace("95", "75")
+    elif "_50" in metric:
+        metric_25 = metric.replace("50", "25")
+        metric_75 = metric.replace("50", "75")
+    else:
+        metric_25 = metric + "_25"
+        metric_75 = metric + "_75"
+
+    print(f"Filling between {metric_25} and {metric_75}")
+
+    ax.fill_between(
+        group_sorted[variable],
+        group_sorted[metric_25],
+        group_sorted[metric_75],
+        alpha=0.2,
+    )
 
 
 def get_line_style(scheduler):
@@ -257,7 +391,7 @@ def get_file_sizes(size):
     elif size == "1048576":
         return "1 MiB"
     elif size == "5242880":
-        return "10 MiB"
+        return "5 MiB"
     else:
         return size
 

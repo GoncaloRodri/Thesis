@@ -8,12 +8,7 @@ def parse_detailed(data):
         is_control = not scheduler.startswith("PRIV")
 
         # Assign dummy values for control
-        epsilon = entry["tor_params"].get("dp_epsilon", "control")
-        if is_control:
-            epsilon = "0"
-            distribution = "CONTROL"
-        else:
-            distribution = entry["tor_params"]["dp_distribution"]
+        epsilon = entry["tor_params"].get("dp_epsilon", "-1.0")
 
         clients = int(entry["client_params"]["bulk_clients"]) + int(entry["client_params"]["web_clients"])
 
@@ -21,7 +16,7 @@ def parse_detailed(data):
             "name": name,
             "scheduler": scheduler,
             "epsilon": epsilon,
-            "distribution": distribution,
+            "distribution": entry["tor_params"].get("dp_distribution", "CONTROL"),
             "clients": clients,
             "latency": entry["latency"]["mean"],
             "latency_95": entry["latency_p"]["95th"],

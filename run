@@ -5,6 +5,13 @@ case "$1" in
     sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/config.yaml -v"
     exit 0
     ;;
+
+"t1")
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/dummy.yaml -v > testing/scripts/tester/dummy.log"
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/jitter.yaml -v > testing/scripts/tester/jitter.log"
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/config.yaml -v > testing/scripts/tester/config.log"
+    exit 0
+    ;;
 "b" | "build")
     docker buildx build \
         -t gugarodri/dptor_node:latest \
@@ -25,10 +32,6 @@ case "$1" in
     python3 -m venv testing/scripts/ploter/venv
     source testing/scripts/ploter/venv/bin/activate
     pip install -r testing/scripts/ploter/requirements.txt
-    mkdir -p testing/results/figures/dummy
-    mkdir -p testing/results/figures/jitter
-    mkdir -p testing/results/figures/jitter_dummy
-    mkdir -p testing/results/figures/dummy_count
     sh -c "python3 testing/scripts/ploter/main.py"
     deactivate
     exit 0
