@@ -1,46 +1,42 @@
 services: 
   authority:
-      image: gugarodri/dptor_node:latest
-      volumes:
-        - ./testing/configuration/:/app/conf/
-        - ./testing/logs:/app/logs/
-      environment:
-        - RELAY_TYPE=authority
-      hostname: "authority"
-      deploy:
-        replicas: 1
-      networks:
-        - swarm
+    image: gugarodri/dptor_node:latest
+    volumes:
+      - ./testing/configuration/:/app/conf/
+      - ./testing/logs:/app/logs/
+    environment:
+      - RELAY_TYPE=authority
+    hostname: "authority"
+    deploy:
+      replicas: 1
+    networks:
+      - swarm
 
   relay:
-      image: gugarodri/dptor_node:latest
-      volumes:
-        - ./testing/configuration/:/app/conf/
-        - ./testing/logs/:/app/logs/
-      environment:
-        - RELAY_TYPE=relay
-      hostname: "relay-{{.Task.Slot}}"
-      deploy:
-        replicas: 5
-      networks:
-        - swarm
-      depends_on:
-      - authority
+    image: gugarodri/dptor_node:latest
+    volumes:
+      - ./testing/configuration/:/app/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - RELAY_TYPE=relay
+    hostname: "relay-{{.Task.Slot}}"
+    deploy:
+      replicas: 2
+    networks:
+      - swarm
 
   exit:
-      image: gugarodri/dptor_node:latest
-      volumes:
-        - ./testing/configuration/:/app/conf/
-        - ./testing/logs/:/app/logs/
-      environment:
-        - RELAY_TYPE=exit
-      hostname: "exit-{{.Task.Slot}}"
-      deploy:
-        replicas: 3
-      networks:
-        - swarm
-      depends_on:
-      - authority
+    image: gugarodri/dptor_node:latest
+    volumes:
+      - ./testing/configuration/:/app/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - RELAY_TYPE=exit
+    hostname: "exit-{{.Task.Slot}}"
+    deploy:
+      replicas: 1
+    networks:
+      - swarm
   
   client:
     image: gugarodri/dptor_node:latest
@@ -54,11 +50,14 @@ services:
       replicas: 1
     networks:
       - swarm
-    depends_on:
-    - authority
     ports:
       - "9000:9000"
 
+  httpserver:
+    image: gugarodri/dptor_httpserver:latest
+    networks:
+      - swarm
+
 networks:
   swarm:
-    driver: overlay
+    external: true
