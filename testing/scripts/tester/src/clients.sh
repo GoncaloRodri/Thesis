@@ -80,31 +80,11 @@ launch_localclients() {
     run_localclient "$log_file_path" "$filesize"
 }
 
-run_topwebclient() {
-    local name="$1"
-    local filesize="$2"
-    local test_count="$3"
-    local tcpdump_mode="$4"
-    local client_id="$5"
-    shift 5
-    local urls=("$@")
-
-    for url in "${urls[@]}"; do
-        if [[ -z "$url" ]]; then
-            log_error "run_topwebclient()" "URL is empty, skipping..."
-            continue
-        fi
-        start_tcpdump "$client_id" "$url"
-        exec_curl "$url" "$client_id" "$name-$test_count" "$test_count"
-        echo -ne "⚠️ \e[33mExecuting Curl Request [${url}]                   \e[0m"\\r
-        stop_tcpdump
-    done
-}
-
 start_tcpdump() {
     for container in "${CONTAINERS[@]}"; do
         start_tcpdump_on_relay "$container" "$1" "$2" &
     done
+    wait
 }
 
 stop_tcpdump() {
@@ -115,51 +95,65 @@ stop_tcpdump() {
 
 start_tcpdump_on_relay() {
     local relay_name="$1"
-    local client="$2"
-    local id="$3"
-    docker exec -d "thesis-${relay_name}-1" sh -c "(tcpdump -i eth0 -w /app/logs/wireshark/${relay_name}/${client}-${id}.pcap)"
+    local id="$2"
+    docker exec -d "thesis-${relay_name}-1" sh -c "(tcpdump -i eth0 -w /app/logs/wireshark/${relay_name}/${id}.pcap)"
 }
 
 stop_tcpdump_on_relay() {
     local relay_name="$1"
     docker exec -d "thesis-${relay_name}-1" sh -c "pkill tcpdump"
 }
+    
+run_topwebclient() {
+    local name="$1"
+    shift 1
+    local urls=("$@")
+
+    if [[ ${#urls[@]} -eq 0 ]]; then
+        log_fatal "run_topwebclient()" "No URLs provided for top web client."
+    fi
+
+    log_info "Starting Top Web Client for $name"
+
+    for url in "${urls[@]}"; do
+        if [[ -z "$url" ]]; then
+            log_error "run_topwebclient()" "URL is empty, skipping..."
+            continue
+        fi
+        start_tcpdump "$name" "$url"
+        log="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}curl_website.log"
+        echo "⚠️ \e[33mExecuting Curl Request [${url}]                   \e[0m"\\r
+        exec_website_curl "$url" "$log"
+        sleep 1
+        stop_tcpdump
+    done
+}
 
 launch_topweb_clients() {
     echo "Launching top web clients..."
     local name="$1"
-    local filesize="$2"
-    local test_count="$3"
-    local test_timeout="$4"
-    local top_web_clients="$5"
-    local tcpdump_mode="$6"
-
-    echo "Top web clients: $name with $top_web_clients clients, filesize: $filesize, test_count: $test_count, tcpdump_mode: $tcpdump_mode"
+    local test_count="$2"
 
     local file_path="${CONFIG["absolute_path_dir"]}/${CONFIG["top_website_path"]}"
-
-    echo "Launching top web clients for $name with $top_web_clients clients..."
 
     if [[ ! -f "$file_path" ]]; then
         log_fatal "fetch_topweb_urls()" "Top websites file not found: $file_path"
     fi
-    echo "Fetching top websites from $file_path..."
+
     websites=()
     while IFS= read -r line; do
-        websites+=("$line")
-        echo -ne "Added URL: $line                      "\\r
+        websites+=("www.${line}")
     done <"$file_path"
 
     if [[ ${#websites[@]} -eq 0 ]]; then
         log_fatal "launch_topweb_clients()" "No URLs found in the top websites file."
     fi
 
-    log_info "Launching top $top_web_clients web clients for $name..."
-    for ((k = 0; k < top_web_clients; k++)); do
-        run_topwebclient "$name" "$filesize" "$test_count" "$tcpdump_mode" "$k" "${websites[@]}" &
-    done
+    echo "Top websites loaded: ${websites[*]} URLs"
 
-    wait
+    log_info "Requesting Top Websites..."
+    
+    run_topwebclient "$name" "${websites[@]}"
 
     log_success "Top web clients for $name have completed."
 }

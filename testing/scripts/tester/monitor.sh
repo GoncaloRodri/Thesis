@@ -22,7 +22,6 @@ for experiment in "${EXPERIMENTS[@]}"; do
     tor_params=$(echo "$experiment" | jq -r '.tor')
 
     run_experiment "$name" "$tcpdump_mode" "$file_size" "${CONFIG["end_test_at"]}" "$client_params" "$tor_params"
-
 done
 
 run_combinations

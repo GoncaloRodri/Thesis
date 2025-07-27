@@ -28,7 +28,11 @@ run_experiment() {
 
         # Run the performance experiment
         log_info "Launching '$name-$ii'"
-        mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/$name-$ii"
+        if [ -n "$top_web_clients" ] && [ "$top_web_clients" -gt 0 ]; then
+            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/website-$name-$ii"
+        elif [ -n "$bulk_clients" ] && [ -n "$web_clients" ] && { [ "$bulk_clients" -gt 0 ] || [ "$web_clients" -gt 0 ]; }; then
+            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/$name-$ii"
+        fi
 
         log_info "Cleaning up Docker containers and images..."
         docker_clean
@@ -44,7 +48,7 @@ run_experiment() {
 
         if [ -n "$top_web_clients" ] && [ "$top_web_clients" -gt 0 ]; then
             log_info "Starting Top Websites Clients Experiment..."
-            launch_topweb_clients "$name" "$file_size" "$ii" "$end_test_at" "$top_web_clients"
+            launch_topweb_clients "website-$name" "$ii"
             log_info "Bulk/Web Clients Experiment Completed!"
         elif [ -n "$bulk_clients" ] && [ -n "$web_clients" ] && { [ "$bulk_clients" -gt 0 ] || [ "$web_clients" -gt 0 ]; }; then
             log_info "Starting Bulk/Web Clients Experiment..."
@@ -66,7 +70,11 @@ run_experiment() {
 
 save_logs() {
     logs_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}"
-    copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}$1-$2"
+    if [ "$6" -gt 0 ]; then
+        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}website-$1-$2"
+    else
+        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}$1-$2"
+    fi
     log_info "Copying logs to ${copy_dir}"
 
     mkdir -p "${copy_dir}"
@@ -123,6 +131,9 @@ run_combinations() {
 
     SCHEDULER_LIST=$(echo "$COMBINATIONS" | jq '.tor.scheduler')
     NUM_SCHEDULER=$(echo "$SCHEDULER_LIST" | jq 'length')
+
+    TOTAL_COMBINATIONS_COUNT=$((NUM_CLIENTS * NUM_DUMMY * NUM_MAX_JITTER * NUM_MIN_JITTER * NUM_TARGET_JITTER * NUM_DP_DIST * NUM_DP_EPSILON * NUM_SCHEDULER * NUM_FILESIZE))
+
 
     for ((i = 0; i < NUM_CLIENTS; i++)); do
         for ((j = 0; j < NUM_DUMMY; j++)); do
