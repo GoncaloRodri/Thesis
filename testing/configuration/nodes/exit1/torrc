@@ -1,3 +1,6 @@
 %include /app/conf/tor.common.torrc
 %include /app/conf/tor.relay.torrc
 %include /app/conf/tor.exit.torrc
+
+Address 10.5.0.4
+Nickname exit1

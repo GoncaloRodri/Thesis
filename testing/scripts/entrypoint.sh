@@ -1,13 +1,15 @@
 #!/bin/bash
 HOST=$(hostname)
 IP_ADDRESS=$(hostname -i)
-NICKNAME=$(echo $HOST | tr -d '-')
-
+#NICKNAME=$(echo $HOST | tr -d '-')
+NICKNAME=$NAME
 if [ "$RELAY_TYPE" == "authority" ]; then
-    sed -i "s/DirAuthority .*/DirAuthority authority orport=9001 v3ident=251A6199439061376DBDEB65848324E2D5EC89C7 ${IP_ADDRESS}:9030 A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1/" /app/conf/tor.common.torrc
+    NICKNAME="authority"
+    #sed -i "s/DirAuthority .*/DirAuthority authority orport=9001 v3ident=251A6199439061376DBDEB65848324E2D5EC89C7 ${IP_ADDRESS}:9030 A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1/" /app/conf/tor.common.torrc
+    sed -i "s/DirAuthority .*/DirAuthority authority orport=9001 v3ident=D83B30C52A01D2FAC15BB04E1AAD0B96952A7765 ${IP_ADDRESS}:9030 14B4571ADA1480D77F854A50469EFC4214C5445D/" /app/conf/tor.common.torrc
 else
     echo "================================================================================"
-    sleep 30
+    sleep 10
     echo "Waiting for authority to be ready..."
 fi
 
@@ -34,6 +36,14 @@ cd /app/tor || exit 1
 echo "================================================================================"
 echo "NICKNAME: $NICKNAME"
 echo "IP_ADDRESS: $IP_ADDRESS"
+
+
 cat /app/tor/torrc
+
+echo "================================================================================\n"
+
+if [ "$RELAY_TYPE" == "authority" ]; then
+    sleep 30
+fi
 
 (tor -f /app/tor/torrc) | tee /app/logs/tor/"$NICKNAME".tor.log

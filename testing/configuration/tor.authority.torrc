@@ -1,7 +1,24 @@
 DirPort 9030
 
+# Authority Configuration
 AuthoritativeDirectory 1
 V3AuthoritativeDirectory 1
-TestingV3AuthInitialVotingInterval 15 seconds
-TestingV3AuthInitialVoteDelay 5 seconds
-TestingV3AuthInitialDistDelay 5 seconds
+
+# Fix consensus serving paths
+DataDirectory /var/lib/tor
+DirReqStatistics 0
+
+# Timing configuration - slower intervals for debugging
+TestingV3AuthInitialVoteDelay 60 seconds
+TestingV3AuthInitialDistDelay 60 seconds
+TestingV3AuthInitialVotingInterval 300 seconds
+TestingServerConsensusDownloadInitialDelay 60 seconds
+TestingV3AuthVotingStartOffset 60 seconds
+
+# Accept all descriptors for testing
+DirPolicy accept *:*
+AuthDirRejectUnlisted 0
+AuthDirListBadExits 0
+
+# Enable directory caching
+DirCache 1

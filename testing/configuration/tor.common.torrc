@@ -1,22 +1,21 @@
 TestingTorNetwork 1
 DataDirectory .
 Log debug stdout
-AssumeReachable 1
+AssumeReachable 0
 
 ControlPort 9051
-LogTimeGranularity 10
+LogTimeGranularity 1
 HeartbeatPeriod 10
 SafeLogging 0
 CookieAuthentication 0
 
-DirAuthority authority orport=9001 v3ident=251A6199439061376DBDEB65848324E2D5EC89C7 10.0.1.33:9030 A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1
-
-AuthDirTestReachability 0
+DirAuthority authority orport=9001 v3ident=D83B30C52A01D2FAC15BB04E1AAD0B96952A7765 10.5.0.255:9030 14B4571ADA1480D77F854A50469EFC4214C5445D
 
 DisableDebuggerAttachment 0
 
 BandwidthRate 1024000
 BandwidthBurst 1024000
+
 
 ############## Scheduling ##############
 Schedulers PRIV_KIST
@@ -31,4 +30,4 @@ PrivSchedulerMaxJitter 10
 PrivSchedulerTargetJitter 2
 
 ######### Packet Cell Padding ##########
-DummyCellEpsilon -1
+DummyCellEpsilon 0

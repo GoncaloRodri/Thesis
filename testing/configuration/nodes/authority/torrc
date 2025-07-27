@@ -1,8 +1,6 @@
 %include /app/conf/tor.authority.torrc
 %include /app/conf/tor.common.torrc
+%include /app/conf/tor.relay.torrc
 
-ClientOnly 0
-SocksPort 0
-
-Address 10.0.1.33
+Address 10.5.0.255
 Nickname authority

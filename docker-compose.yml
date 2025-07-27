@@ -1,6 +1,6 @@
 services:
   authority:
-    image: dptor_node
+    image: gugarodri/dptor_node:latest
     volumes:
       - ./testing/configuration/:/app/conf/
       - ./testing/logs:/app/logs/
@@ -12,43 +12,43 @@ services:
         ipv4_address: 10.5.0.255
 
   relay1:
-    image: dptor_node
+    image: gugarodri/dptor_node:latest
     volumes:
       - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay1
-      - RELAY_TYPE=relay1
+      - RELAY_TYPE=relay
     networks:
       net:
         ipv4_address: 10.5.0.2
     
   relay2:
-    image: dptor_node
+    image: gugarodri/dptor_node:latest
     volumes:
       - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=relay2
-      - RELAY_TYPE=relay2
+      - RELAY_TYPE=relay
     networks:
       net:
         ipv4_address: 10.5.0.3
 
   exit1:
-    image: dptor_node
+    image: gugarodri/dptor_node:latest
     volumes:
       - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - NAME=exit1
-      - RELAY_TYPE=exit1
+      - RELAY_TYPE=exit
     networks:
       net:
         ipv4_address: 10.5.0.4  
 
   client:
-    image: dptor_node
+    image: gugarodri/dptor_node:latest
     ports:
       - 9000:9000
     volumes:

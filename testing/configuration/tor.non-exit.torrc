@@ -1,1 +1,2 @@
 #ExitPolicy reject *:*
+ExitRelay 0
