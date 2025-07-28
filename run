@@ -14,8 +14,16 @@ case "$1" in
     ;;
 "b" | "build")
     docker buildx build \
+        -t gugarodri/dptor_base \
+        -f testing/docker/base.Dockerfile \
+        .
+    docker buildx build \
         -t dptor_node \
         -f testing/docker/node.Dockerfile \
+        .
+    docker buildx build \
+        -t gugarodri/dptor_swarm \
+        -f testing/docker/swarm.Dockerfile \
         .
     exit 0
     ;;

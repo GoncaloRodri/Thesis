@@ -1,0 +1,64 @@
+services: 
+  dirauth:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ./testing/configuration/:/app/conf/
+      - ./testing/logs:/app/logs/
+    environment:
+      - RELAY_TYPE=authority
+    hostname: "authority"      
+    deploy:
+      replicas: 1
+    networks:
+      - swarm
+
+  relay:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ./testing/configuration/:/app/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - RELAY_TYPE=relay
+    hostname: "relay-{{.Task.Slot}}"
+    deploy:
+      replicas: 2
+    networks:
+      - swarm
+
+  exit:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ./testing/configuration/:/app/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - RELAY_TYPE=exit
+    hostname: "exit-{{.Task.Slot}}"
+    deploy:
+      replicas: 1
+    networks:
+      - swarm
+  
+  client:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ./testing/configuration/:/app/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - RELAY_TYPE=client
+    hostname: "client-{{.Task.Slot}}"
+    deploy:
+      replicas: 1
+    networks:
+      - swarm
+    ports:
+      - "9000:9000"
+
+  httpserver:
+    image: gugarodri/dptor_httpserver:latest
+    networks:
+      - swarm
+
+networks:
+  swarm:
+    attachable: true
+    driver: overlay
