@@ -60,5 +60,4 @@ services:
 
 networks:
   swarm:
-    attachable: true
-    driver: overlay
+    external: true

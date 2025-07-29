@@ -7,22 +7,18 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/utils.sh"
 
 BOOTSTRAP_SLEEP=1
-MAX_TIME_TO_BOOTSTRAP=90
+MAX_TIME_TO_BOOTSTRAP=120
 PERFORMANCE_BOOTSTRAP_COUNTER=5
-DOCKER_COMPOSE_FILE="docker-compose.yml"
+DOCKER_COMPOSE_FILE="swarm.docker-compose.yml"
 
 launch_tor_network() {
-    docker_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["docker_dir"]}"
 
-    df="${CONFIG["absolute_path_dir"]}/${DOCKER_COMPOSE_FILE}"
-
-    if [ "$BUILD" == true ]; then
-        log_info "launch_tor_network()" "Building Docker images..."
-        docker build --no-cache -f "${docker_dir}/node.Dockerfile" -t dptor_node "${CONFIG["absolute_path_dir"]}" || log_fatal "launch_tor_network()" "Failed to build Docker image for curl.docker-compose.yml"
-    fi
+    docker network create --attachable --driver overlay swarm
 
     while true; do
-        COMPOSE_BAKE=true docker compose -f "$df" up -d
+        #COMPOSE_BAKE=true docker compose -f "$df" up -d
+
+        docker stack deploy --detach=false -c swarm.docker-compose.yml thesis
 
         local start end elapsed
 
@@ -42,8 +38,10 @@ launch_tor_network() {
                 echo -ne "⚠️ \e[33mWarning: Tor Network is not bootstrapped yet! ($a of $PERFORMANCE_BOOTSTRAP_COUNTER) [$elapsed s]\e[0m"\\r
             fi
         done
+        echo 
         log_error "launch_tor_network()                                             " "Tor Network failed to bootstrap within $MAX_TIME_TO_BOOTSTRAP seconds. Retrying..."
-        docker compose -f "$df" down --remove-orphans
+        #docker compose -f "$df" down --remove-orphans
+        docker stack rm -d=false thesis
         sleep 20
     done
 
@@ -51,9 +49,9 @@ launch_tor_network() {
 }
 
 docker_clean() {
-    cd "${CONFIG["absolute_path_dir"]}" || log_fatal "docker_clean()" "Failed to change directory to ${CONFIG["absolute_path_dir"]}"
-    df="${CONFIG["absolute_path_dir"]}/${DOCKER_COMPOSE_FILE}"
-    docker compose -f $df down --remove-orphans
+    docker stack rm -d=false thesis
+    sleep 3
+    docker network rm -f swarm      
 }
 
 set_configuration() {

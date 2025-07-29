@@ -1,3 +1,6 @@
 %include /app/conf/tor.authority.torrc
 %include /app/conf/tor.common.torrc
 %include /app/conf/tor.relay.torrc
+
+Address 10.0.1.39
+Nickname authority

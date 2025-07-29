@@ -18,13 +18,23 @@ case "$1" in
         -f testing/docker/base.Dockerfile \
         .
     docker buildx build \
-        -t dptor_node \
+        -t gugarodri/dptor_node \
         -f testing/docker/node.Dockerfile \
         .
     docker buildx build \
         -t gugarodri/dptor_swarm \
         -f testing/docker/swarm.Dockerfile \
         .
+    exit 0
+    ;;
+"p" | "push")
+    docker push gugarodri/dptor_base
+    docker push dptor_node
+    docker push gugarodri/dptor_swarm
+    exit 0
+    ;;
+"s" | "swarm")
+    sh -c "./testing/scripts/tester/swarm.sh -c testing/scripts/tester/config.yaml -v"
     exit 0
     ;;
 "a" | "analyze")
