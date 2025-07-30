@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import os
 
 
@@ -14,9 +13,9 @@ def plot_dummy(metric, filesize, data, show=False):
         filtered_group = group[group["dummy"] >= 0]
         group_sorted = filtered_group.sort_values("dummy")
 
-        __plot(ax, group_sorted["dummy"], group_sorted[metric], sched)
+        # __plot(ax, group_sorted["dummy"], group_sorted[metric], sched)
 
-        __fill_between(ax, "dummy", group_sorted, metric)
+        __fill_between(ax, "dummy", group_sorted, metric, sched, label=sched)
 
     if __draw_ax(
         ax,
@@ -51,8 +50,8 @@ def plot_jitter_by_distribution(metric, dist, filesize, data, show=False):
         filtered_group = group[group["epsilon"] >= 0]
         group_sorted = filtered_group.sort_values("epsilon")
 
-        __plot(ax, group_sorted["epsilon"], group_sorted[metric], sched)
-        __fill_between(ax, "epsilon", group_sorted, metric)
+        # __plot(ax, group_sorted["epsilon"], group_sorted[metric], sched)
+        __fill_between(ax, "epsilon", group_sorted, metric, sched, label=sched)
 
     if __draw_ax(
         ax,
@@ -87,7 +86,9 @@ def plot_jitter(metric, filesize, data, show=False):
             else f"{sched}"
         )
 
-        __plot(ax, group_sorted["epsilon"], group_sorted[metric], sched, label=label)
+        # __plot(ax, group_sorted["epsilon"], group_sorted[metric], sched, label=label)
+
+        __fill_between(ax, "epsilon", group_sorted, metric, sched, label=label)
 
     if __draw_ax(
         ax,
@@ -160,7 +161,6 @@ def plot_dummy_count(data, show=False):
         if float(eps) >= 0:
             continue
 
-        print(group)
         filtered_group = group[group["dummy"] >= 0]
         group_sorted = filtered_group.sort_values("dummy")
 
@@ -169,13 +169,13 @@ def plot_dummy_count(data, show=False):
             group_sorted["dummy"],
             group_sorted["total_dummies"],
             sched,
-            label=f"{sched}",
+            label=f"{sched} | {get_file_sizes(file_size)}",
         )
 
     if __draw_ax(
         ax,
         "Packet Generation Epsilon",
-        f"Total False Cells ({get_file_sizes(file_size)})",
+        "Nº of False Cells Created",
         "dummy_count",
         file_size,
     ):
@@ -185,7 +185,7 @@ def plot_dummy_count(data, show=False):
     __save_fig(
         fig,
         "dummy_count",
-        file_size,
+        "",
         "dummy_count",
         show,
     )
@@ -200,7 +200,6 @@ def plot_dummy_ratio(data, show=False):
         if float(eps) >= 0:
             continue
 
-        print(group)
         filtered_group = group[group["dummy"] >= 0]
         group_sorted = filtered_group.sort_values("dummy")
 
@@ -214,13 +213,13 @@ def plot_dummy_ratio(data, show=False):
                 )
             ],
             sched,
-            label=f"{sched} (Dummies/Cells Ratio)",
+            label=f"{sched} | {get_file_sizes(file_size)}",
         )
 
     if __draw_ax(
         ax,
         "Packet Generation Epsilon",
-        f"Total Cells vs Cell Generation Epsilon ({get_file_sizes(file_size)})",
+        "Total Cells vs Cell Generation Epsilon",
         "dummy_ratio",
         file_size,
     ):
@@ -245,7 +244,7 @@ def plot_packet_count(data, show=False):
         if float(eps) >= 0:
             continue
 
-        print(group)
+        # print(group)
         filtered_group = group[group["dummy"] >= 0]
         group_sorted = filtered_group.sort_values("dummy")
 
@@ -254,13 +253,13 @@ def plot_packet_count(data, show=False):
             group_sorted["dummy"],
             group_sorted["total_packets"],
             sched,
-            label=f"{sched} | {dist.capitalize()} | {get_file_sizes(file_size)}",
+            label=f"{sched} | {get_file_sizes(file_size)}",
         )
 
     if __draw_ax(
         ax,
         "Packet Generation Epsilon",
-        f"TLS Packet Count ({get_file_sizes(file_size)})",
+        "TLS Packet Count",
         "dummy_count",
         file_size,
     ):
@@ -305,7 +304,7 @@ def __draw_ax(ax, x_label, title, metric, file_size):
     ax.set_title(title)
     ax.set_xlabel(x_label)
     ax.set_ylabel(get_units(metric))
-    ax.legend(bbox_to_anchor=(1.05, 1))
+    ax.legend(loc="best", bbox_to_anchor=(1.05, 1))
     ax.grid(True)
     return False
 
@@ -317,51 +316,91 @@ def __save_fig(fig, metric, file_size, file_name, show=False):
     path = f"{abs_path()}/{metric}"
     os.makedirs(path, exist_ok=True)
     fig.savefig(
-        f"{path}/{file_name}_{get_file_sizes(file_size).lower().replace(' ', '_')}.png"
+        f"{path}/{file_name}_{get_file_sizes(file_size).lower().replace(' ', '_')}.png",
+        dpi=300,
+        bbox_inches="tight",
     )
     if show:
         fig.show()
     plt.close("all")
 
 
-def __fill_between(ax, variable, group_sorted, metric):
+def __fill_between(ax, variable, group_sorted, metric, sched, label=""):
     """
     Helper function to fill the area between two percentiles.
     """
-
-    print(f"Filling between for metric: {metric}")
 
     if metric not in [
         "latency",
         "throughput",
         "total_time",
+        "jitter",
         "latency_50",
         "throughput_50",
         "total_time_50",
-        "latency_95",
-        "throughput_95",
-        "total_time_95",
     ]:
         return
 
-    if "_95" in metric:
-        metric_25 = metric.replace("95", "25")
-        metric_75 = metric.replace("95", "75")
-    elif "_50" in metric:
-        metric_25 = metric.replace("50", "25")
-        metric_75 = metric.replace("50", "75")
+    if "_50" in metric:
+        print(f"Filling between percentiles for {metric}")
+        metric_10 = metric.replace("50", "10")
+        metric_90 = metric.replace("50", "90")
+
+        ax.plot(
+            group_sorted[variable],
+            group_sorted[metric],
+            marker="o",
+            label=label if label else f"{sched}",
+            linestyle=get_line_style(sched),
+        )
+
+        ax.fill_between(
+            group_sorted[variable],
+            group_sorted[metric_10],
+            group_sorted[metric_90],
+            alpha=0.4,
+        )
+        return
+
+    if "jitter" in metric:
+
+        lower_b = group_sorted[metric] - group_sorted[f"{metric}_var"]
+        upper_b = group_sorted[metric] + group_sorted[f"{metric}_var"]
+
+        lower_clamped = lower_b.clip(lower=0)
+
+        lower_error = group_sorted[metric] - lower_clamped
+        upper_error = upper_b - group_sorted[metric]
+
+        ax.errorbar(
+            group_sorted[variable],
+            group_sorted[metric],
+            yerr=[lower_error, upper_error],
+            fmt="-o",
+            capsize=3,
+            label=label,
+        )
+        return
+
     else:
-        metric_25 = metric + "_25"
-        metric_75 = metric + "_75"
 
-    print(f"Filling between {metric_25} and {metric_75}")
+        lower_b = group_sorted[metric] - group_sorted[f"{metric}_std_dev"]
+        upper_b = group_sorted[metric] + group_sorted[f"{metric}_std_dev"]
 
-    ax.fill_between(
-        group_sorted[variable],
-        group_sorted[metric_25],
-        group_sorted[metric_75],
-        alpha=0.2,
-    )
+        lower_clamped = lower_b.clip(lower=0)
+
+        lower_error = group_sorted[metric] - lower_clamped
+        upper_error = upper_b - group_sorted[metric]
+
+        ax.errorbar(
+            group_sorted[variable],
+            group_sorted[metric],
+            yerr=[lower_error, upper_error],
+            fmt="-o",
+            capsize=3,
+            label=label,
+        )
+        return
 
 
 def get_line_style(scheduler):

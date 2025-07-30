@@ -1,8 +1,5 @@
-import contextlib
 import re
-import json
 import numpy as np
-import utils.utils as utils
 
 
 def get_info(data) -> list[dict]:
@@ -18,15 +15,11 @@ def compute_metrics(stats: dict) -> dict:
         "min": float(np.min(stats)),
         "max": float(np.max(stats)),
         "mean": float(np.mean(stats)),
-        "median": float(np.median(stats)),
         "std": float(np.std(stats)),
         "percentiles": {
-            "25th": float(np.percentile(stats, 25)),
+            "10th": float(np.percentile(stats, 10)),
             "50th": float(np.percentile(stats, 50)),
-            "75th": float(np.percentile(stats, 75)),
             "90th": float(np.percentile(stats, 90)),
-            "95th": float(np.percentile(stats, 95)),
-            "99th": float(np.percentile(stats, 99)),
         },
     }
 

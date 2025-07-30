@@ -1,4 +1,3 @@
-import argparse
 import os
 import utils.utils as utils
 import parsers.curl as curl_parser
