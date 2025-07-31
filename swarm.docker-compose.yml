@@ -1,5 +1,5 @@
 services: 
-  dirauth:
+  authority:
     image: gugarodri/dptor_swarm:latest
     volumes:
       - ./testing/configuration/:/app/conf/
