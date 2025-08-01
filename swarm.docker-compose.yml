@@ -2,10 +2,14 @@ services:
   authority:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/logs:/app/logs/
+      - ~/Thesis/testing/logs:/app/logs/
     environment:
       - RELAY_TYPE=authority
     hostname: "authority"
+    ports:
+      - "9001:9001"
+      - "9030:9030"
+      - "9051:9051"
     deploy:
       replicas: 1
       placement:
@@ -17,7 +21,7 @@ services:
   relay-1:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/logs/:/app/logs/
+      - ~/Thesis/testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=relay
     hostname: "relay-1"
@@ -32,7 +36,7 @@ services:
   relay-2:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/logs/:/app/logs/
+      - ~/Thesis/testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=relay
     hostname: "relay-2"
@@ -47,7 +51,7 @@ services:
   exit:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/logs/:/app/logs/
+      - ~/Thesis/testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=exit
     hostname: "exit-1"
@@ -62,7 +66,7 @@ services:
   client:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/logs/:/app/logs/
+      - ~/Thesis/testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=client
     hostname: "client"
@@ -70,7 +74,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.node == client
+          - node.labels.node == exit1
     networks:
       - swarm
     ports:
@@ -84,7 +88,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.labels.node == client
+          - node.labels.node == authority
 
 
 networks:
