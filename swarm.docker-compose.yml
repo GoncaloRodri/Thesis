@@ -6,22 +6,44 @@ services:
       - ./testing/logs:/app/logs/
     environment:
       - RELAY_TYPE=authority
-    hostname: "authority"      
+    hostname: "authority"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == authority
     networks:
       - swarm
 
-  relay:
+  relay-1:
     image: gugarodri/dptor_swarm:latest
     volumes:
       - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=relay
-    hostname: "relay-{{.Task.Slot}}"
+    hostname: "relay-1"
     deploy:
-      replicas: 2
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == relay1
+    networks:
+      - swarm
+
+  relay-2:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ./testing/configuration/:/app/conf/
+      - ./testing/logs/:/app/logs/
+    environment:
+      - RELAY_TYPE=relay
+    hostname: "relay-2"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == relay2
     networks:
       - swarm
 
@@ -32,9 +54,12 @@ services:
       - ./testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=exit
-    hostname: "exit-{{.Task.Slot}}"
+    hostname: "exit-1"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == exit1
     networks:
       - swarm
   
@@ -45,9 +70,12 @@ services:
       - ./testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=client
-    hostname: "client-{{.Task.Slot}}"
+    hostname: "client"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == client
     networks:
       - swarm
     ports:
@@ -57,7 +85,14 @@ services:
     image: gugarodri/dptor_httpserver:latest
     networks:
       - swarm
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == client
+
 
 networks:
   swarm:
-    external: true
+    driver: overlay
+    attachable: true
