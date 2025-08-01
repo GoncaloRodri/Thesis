@@ -2,7 +2,6 @@ services:
   authority:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/configuration/:/app/conf/
       - ./testing/logs:/app/logs/
     environment:
       - RELAY_TYPE=authority
@@ -18,7 +17,6 @@ services:
   relay-1:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=relay
@@ -34,7 +32,6 @@ services:
   relay-2:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=relay
@@ -50,7 +47,6 @@ services:
   exit:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=exit
@@ -66,7 +62,6 @@ services:
   client:
     image: gugarodri/dptor_swarm:latest
     volumes:
-      - ./testing/configuration/:/app/conf/
       - ./testing/logs/:/app/logs/
     environment:
       - RELAY_TYPE=client

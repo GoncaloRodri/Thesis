@@ -29,7 +29,7 @@ case "$1" in
     ;;
 "p" | "push")
     docker push gugarodri/dptor_base
-    docker push dptor_node
+    docker push gugarodri/dptor_node
     docker push gugarodri/dptor_swarm
     exit 0
     ;;
