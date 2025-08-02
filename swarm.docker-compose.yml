@@ -3,6 +3,7 @@ services:
     image: gugarodri/dptor_swarm:latest
     volumes:
       - ~/Thesis/testing/logs:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
     environment:
       - RELAY_TYPE=authority
     hostname: "authority"
@@ -22,9 +23,12 @@ services:
     image: gugarodri/dptor_swarm:latest
     volumes:
       - ~/Thesis/testing/logs/:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
     environment:
       - RELAY_TYPE=relay
     hostname: "relay-1"
+    ports:
+      - "9001:9001"
     deploy:
       replicas: 1
       placement:
@@ -37,9 +41,12 @@ services:
     image: gugarodri/dptor_swarm:latest
     volumes:
       - ~/Thesis/testing/logs/:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
     environment:
       - RELAY_TYPE=relay
     hostname: "relay-2"
+    ports:
+      - "9001:9001"
     deploy:
       replicas: 1
       placement:
@@ -52,9 +59,12 @@ services:
     image: gugarodri/dptor_swarm:latest
     volumes:
       - ~/Thesis/testing/logs/:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
     environment:
       - RELAY_TYPE=exit
     hostname: "exit-1"
+    ports:
+      - "9001:9001"
     deploy:
       replicas: 1
       placement:
@@ -67,9 +77,11 @@ services:
     image: gugarodri/dptor_swarm:latest
     volumes:
       - ~/Thesis/testing/logs/:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
     environment:
       - RELAY_TYPE=client
     hostname: "client"
+    
     deploy:
       replicas: 1
       placement:
@@ -78,6 +90,7 @@ services:
     networks:
       - swarm
     ports:
+      - "9001:9001"
       - "9000:9000"
 
   httpserver:
