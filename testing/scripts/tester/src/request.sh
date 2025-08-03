@@ -8,14 +8,13 @@ source "${SCRIPT_DIR}/utils.sh"
 RANDOM_INTERVAL=5
 
 exec_curl() {
-    local url="$1"
     local log_file="$2"
-    curl --socks5 127.0.0.1:9000 -H 'Cache-Control: no-cache' -w "URL: $url\nCode: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n" -o /dev/null "$url" >>"$log_file"
+    ssh client "curl --socks5 127.0.0.1:9000 -H 'Cache-Control: no-cache' -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null 54.36.191.12:5000/bytes/${1}" >>"$log_file"
 }
 get_url() {
     #echo "http://ipv4.download.thinkbroadband.com/${1}.zip"
     local link="$(docker exec "$(docker container ls | grep "server" | awk '{print $1}')" hostname -i)"
-    echo "${link}:5000/bytes/${1}"
+    echo "54.36.191.12:5000/bytes/${1}"
 }
 
 get_logfile() {
@@ -24,17 +23,15 @@ get_logfile() {
 }
 
 run_webclient() {
-    local url
     local log_file="$1"
     local filesize="$2"
 
-    url=$(get_url "$filesize")
     local counter=0
     while true; do
         
         sleep $((RANDOM % RANDOM_INTERVAL + 1))
         counter=$((counter + 1))
-        exec_curl "$url" "$log_file"
+        exec_curl "$filesize" "$log_file"
         if ((counter % 10 == 0)); then
             echo -ne "⚠️ \e[33mExecuting Web Client Requests [$counter]\e[0m"\\r
         fi
@@ -59,15 +56,15 @@ run_bulkclient() {
 }
 
 run_localclient() {
-    local url
-    local log_file="$1"
+    local log_file="$(get_logfile $1)"
     local filesize="$2"
     CURL_TEST_NUM="${CONFIG["end_test_at"]}"
 
-    url=$(get_url "$filesize")
+    log_info "run_localclient()" "Executing $CURL_TEST_NUM cURL requests with filesize $filesize bytes..."
+
     for ((curl_i = 0; curl_i < $((CURL_TEST_NUM)); curl_i++)); do
         echo -ne "⚠️ \e[33mExecuting Curl Requests [$curl_i of $CURL_TEST_NUM]\e[0m"\\r
-        exec_curl "$url" "$(get_logfile)"
+        exec_curl "$filesize" "$log_file"
         sleep 1
     done
     echo -ne "⚠️ \e[33mExecuting Curl Requests [100%]\e[0m"\\r

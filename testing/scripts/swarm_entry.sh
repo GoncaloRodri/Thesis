@@ -11,15 +11,6 @@ echo "NICKNAME: $NICKNAME"
 echo "RELAY_TYPE: $RELAY_TYPE"
 echo "================================================================================"
 
-
-if [ "$RELAY_TYPE" == "authority" ]; then
-    sed -i "s/DirAuthority .*/DirAuthority authority orport=9001 v3ident=251A6199439061376DBDEB65848324E2D5EC89C7 ${IP_ADDRESS}:9030 A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1/" /app/conf/tor.common.torrc
-else
-    echo "================================================================================"
-    sleep 10
-    echo "Waiting for authority to be ready..."
-fi
-
 mkdir -p /app/logs/tor
 mkdir -p /app/logs/wireshark/$NICKNAME
 mkdir -p /app/conf
@@ -51,8 +42,5 @@ echo
 echo "================================================================================"
 echo
 
-if [ "$RELAY_TYPE" == "authority" ]; then
-    sleep 10
-fi
 
 (tor -f /app/tor/torrc) | tee /app/logs/tor/"$NICKNAME".tor.log

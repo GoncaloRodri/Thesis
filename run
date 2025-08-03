@@ -2,14 +2,13 @@
 
 case "$1" in
 "r" | "run")
-    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/config.yaml -v"
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/dummy.perf.yaml -v | tee testing/scripts/tester/dummy.perf.log"
     exit 0
     ;;
 
 "t1")
-    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/dummy.yaml -v > testing/scripts/tester/dummy.log"
-    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/jitter.yaml -v > testing/scripts/tester/jitter.log"
-    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/config.yaml -v > testing/scripts/tester/config.log"
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/control.perf.yaml -v | tee testing/scripts/tester/control.perf.log"
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/dummy.perf.yaml -v | tee testing/scripts/tester/dummy.perf.log"
     exit 0
     ;;
 "b" | "build")
@@ -27,7 +26,7 @@ case "$1" in
         .
     exit 0
     ;;
-"p" | "push")
+"push")
     docker push gugarodri/dptor_base
     docker push gugarodri/dptor_node
     docker push gugarodri/dptor_swarm

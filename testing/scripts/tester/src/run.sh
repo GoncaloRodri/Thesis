@@ -69,6 +69,19 @@ run_experiment() {
 }
 
 save_logs() {
+
+    from=(
+        authority
+        relay1
+        relay2
+        exit1
+        client
+    )
+
+    for node in "${from[@]}"; do
+        scp -r "$node:~/Thesis/testing/logs/tor/*" "/home/guga/Documents/Thesis/testing/logs/tor"
+    done
+
     logs_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}"
     if [ "$6" -gt 0 ]; then
         copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}website-$1-$2"
