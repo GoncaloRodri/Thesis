@@ -1,5 +1,5 @@
 config:
-  absolute_path: /home/ubuntu/thesis
+  absolute_path: /home/ubuntu/Thesis
   repeat: 1
   copy_logs: true
   logs_dir: testing/logs/
