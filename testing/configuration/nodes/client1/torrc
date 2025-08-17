@@ -1,0 +1,5 @@
+%include /app/conf/tor.common.torrc
+%include /app/conf/tor.client.torrc
+
+Address 10.0.1.6
+Nickname client1
