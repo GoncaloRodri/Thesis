@@ -3,7 +3,7 @@ DataDirectory .
 Log info stdout
 AssumeReachable 1
 
-DirAuthority authority orport=9001 v3ident=251A6199439061376DBDEB65848324E2D5EC89C7 10.5.0.255:9030 A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1
+DirAuthority authority orport=9001 v3ident=251A6199439061376DBDEB65848324E2D5EC89C7 54.36.191.12:9030 A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1
 
 ControlPort 9051
 LogTimeGranularity 10
@@ -21,14 +21,11 @@ DisableDebuggerAttachment 0
 BandwidthRate 1024000
 BandwidthBurst 1024000
 
-Address 10.5.0.3
-Nickname relay2
-
 ############## Scheduling ##############
 Schedulers PRIV_KIST
 
 ######### Differential Privacy #########
-PrivSchedulerEpsilon 0
+PrivSchedulerEpsilon -1
 PrivSchedulerDistribution LAPLACE
 
 ################ Jitter ################

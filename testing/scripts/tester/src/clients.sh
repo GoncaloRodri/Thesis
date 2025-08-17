@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/utils.sh"
 source "${SCRIPT_DIR}/request.sh"
 
-CONTAINERS=("client" "relay1" "relay2" "exit1")
+CONTAINERS=("client" "relay1" "relay2" "exit1" "authority")
 
 launch_clients() {
     local name="$1"
@@ -96,12 +96,12 @@ stop_tcpdump() {
 start_tcpdump_on_relay() {
     local relay_name="$1"
     local id="$2"
-    docker exec -d "thesis-${relay_name}-1" sh -c "(tcpdump -i eth0 -w /app/logs/wireshark/${relay_name}/${id}.pcap)"
+    ssh "$1" sh -c "(tcpdump -i eth0 -w ~/Thesis/testing/logs/wireshark/${relay_name}/${id}.pcap)"
 }
 
 stop_tcpdump_on_relay() {
     local relay_name="$1"
-    docker exec -d "thesis-${relay_name}-1" sh -c "pkill tcpdump"
+    ssh "$1" sh -c "pkill tcpdump"
 }
     
 run_topwebclient() {

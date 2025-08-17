@@ -1,0 +1,112 @@
+services: 
+  authority:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ~/Thesis/testing/logs:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
+    environment:
+      - RELAY_TYPE=authority
+    hostname: "authority"
+    ports:
+      - "9001:9001"
+      - "9030:9030"
+      - "9051:9051"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == authority
+    networks:
+      - swarm
+
+  relay-1:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ~/Thesis/testing/logs/:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
+    environment:
+      - RELAY_TYPE=relay
+    hostname: "relay-1"
+    ports:
+      - "9001:9001"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == relay1
+    networks:
+      - swarm
+
+  relay-2:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ~/Thesis/testing/logs/:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
+    environment:
+      - RELAY_TYPE=relay
+    hostname: "relay-2"
+    ports:
+      - "9001:9001"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == relay2
+    networks:
+      - swarm
+
+  exit:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ~/Thesis/testing/logs/:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
+    environment:
+      - RELAY_TYPE=exit
+    hostname: "exit-1"
+    ports:
+      - "9001:9001"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == exit1
+    networks:
+      - swarm
+  
+  client:
+    image: gugarodri/dptor_swarm:latest
+    volumes:
+      - ~/Thesis/testing/logs/:/app/logs/
+      - ~/Thesis/testing/configuration:/app/conf/
+    environment:
+      - RELAY_TYPE=client
+    hostname: "client"
+    
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == exit1
+    networks:
+      - swarm
+    ports:
+      - "9001:9001"
+      - "9000:9000"
+
+  httpserver:
+    image: gugarodri/dptor_httpserver:latest
+    networks:
+      - swarm
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.node == authority
+    ports:
+      - "5000:5000"
+
+
+networks:
+  swarm:
+    driver: overlay
+    attachable: true
