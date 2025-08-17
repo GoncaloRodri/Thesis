@@ -21,7 +21,7 @@ launch_tor_network() {
     # sleep 10
     
     while true; do
-        COMPOSE_BAKE=true docker compose up -d
+        COMPOSE_BAKE=true docker-compose up -d
         #ssh authority docker stack deploy -q --detach=false -c Thesis/swarm.docker-compose.yml thesis
 
         local start end elapsed
@@ -48,7 +48,7 @@ launch_tor_network() {
         done
         echo 
         log_error "launch_tor_network()                                             " "Tor Network failed to bootstrap within $MAX_TIME_TO_BOOTSTRAP seconds. Retrying..."
-        docker compose down --remove-orphans
+        docker-compose down --remove-orphans
         #ssh authority docker stack rm -d=false thesis
         echo
         #sleep 25
@@ -59,7 +59,7 @@ launch_tor_network() {
 
 docker_clean() {
     #ssh authority docker stack rm -d=false thesis
-    docker compose down
+    docker-compose down
 }
 
 set_configuration() {
