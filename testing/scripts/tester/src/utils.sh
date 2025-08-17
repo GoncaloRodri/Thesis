@@ -134,7 +134,7 @@ check_bootstrapped() {
     #     total=$((total + count))
     # done
 
-    echo $(grep -l -R "Bootstrapped 100%" ~/Documents/Thesis/testing/logs/tor/* | wc -l)
+    echo $(grep -l -R "Bootstrapped 100%" ~/Thesis/testing/logs/tor/* | wc -l)
 }
 
 handle_args() {
