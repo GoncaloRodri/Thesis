@@ -9,20 +9,20 @@ source "${SCRIPT_DIR}/utils.sh"
 nodes=("authority" "relay1" "relay2" "exit1" "client")
 
 BOOTSTRAP_SLEEP=1
-MAX_TIME_TO_BOOTSTRAP=10
+MAX_TIME_TO_BOOTSTRAP=60
 PERFORMANCE_BOOTSTRAP_COUNTER=5
-DOCKER_COMPOSE_FILE="swarm.docker-compose.yml"
+DOCKER_COMPOSE_FILE="docker-compose.yml"
 
 launch_tor_network() {
 
-    for node in "${nodes[@]}"; do
-        ssh "$node" "sudo systemctl restart docker"
-    done
-    sleep 10
+    # for node in "${nodes[@]}"; do
+    #     ssh "$node" "sudo systemctl restart docker"
+    # done
+    # sleep 10
     
     while true; do
-        #COMPOSE_BAKE=true docker compose -f "$df" up -d
-        ssh authority docker stack deploy -q --detach=false -c Thesis/swarm.docker-compose.yml thesis
+        COMPOSE_BAKE=true docker compose up -d
+        #ssh authority docker stack deploy -q --detach=false -c Thesis/swarm.docker-compose.yml thesis
 
         local start end elapsed
 
@@ -30,17 +30,16 @@ launch_tor_network() {
         end=$(date +%s)
         elapsed=$((end - start))
 
+        sleep 20
+
         while [ $elapsed -lt $MAX_TIME_TO_BOOTSTRAP ]; do
             sleep "$BOOTSTRAP_SLEEP"
-            log_info "launch_tor_network()" "Checking if Tor Network is bootstrapped... ($elapsed s)"
+            #log_info "launch_tor_network()" "Checking if Tor Network is bootstrapped... ($elapsed s)"
             a=$(check_bootstrapped)
             if [ "$a" -eq $PERFORMANCE_BOOTSTRAP_COUNTER ]; then
                 break 2
             fi
 
-            if [ "$a" -eq 0 ]; then
-                break 1
-            fi 
             end=$(date +%s)
             elapsed=$((end - start))
             if [[ "$VERBOSE" == true ]]; then
@@ -49,17 +48,18 @@ launch_tor_network() {
         done
         echo 
         log_error "launch_tor_network()                                             " "Tor Network failed to bootstrap within $MAX_TIME_TO_BOOTSTRAP seconds. Retrying..."
-        #docker compose -f "$df" down --remove-orphans
-        ssh authority docker stack rm -d=false thesis
+        docker compose down --remove-orphans
+        #ssh authority docker stack rm -d=false thesis
         echo
-        sleep 25
+        #sleep 25
     done
 
     echo
 }
 
 docker_clean() {
-    ssh authority docker stack rm -d=false thesis
+    #ssh authority docker stack rm -d=false thesis
+    docker compose down
 }
 
 set_configuration() {
@@ -87,9 +87,9 @@ set_configuration() {
 
     sed -i "s/^DummyCellEpsilon .*/DummyCellEpsilon ${dummy}/" "${config_path}"tor.common.torrc
 
-    for node in "${nodes[@]}"; do
-        log_info "set_configuration()" "Setting configuration for $node"
-        scp -r "${config_path}" "$node:/home/ubuntu/Thesis/testing/"
-    done
+    # for node in "${nodes[@]}"; do
+    #     log_info "set_configuration()" "Setting configuration for $node"
+    #     scp -r "${config_path}" "$node:/home/ubuntu/Thesis/testing/"
+    # done
 
 }

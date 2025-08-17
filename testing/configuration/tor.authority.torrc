@@ -6,4 +6,4 @@ TestingV3AuthInitialVotingInterval 10 seconds
 TestingV3AuthInitialVoteDelay 2 seconds  
 TestingV3AuthInitialDistDelay 2 seconds
 
-Address 54.36.191.12
+Address 10.5.0.255

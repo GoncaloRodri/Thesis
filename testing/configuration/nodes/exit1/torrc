@@ -2,5 +2,5 @@
 %include /app/conf/tor.relay.torrc
 %include /app/conf/tor.exit.torrc
 
-Address 10.0.1.45
+Address 10.5.0.4
 Nickname exit1

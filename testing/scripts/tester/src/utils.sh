@@ -119,22 +119,22 @@ check_bootstrapped() {
     logs_path="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}tor/*"
     # shellcheck disable=SC2086
 
-    nodes=(
-        authority
-        relay1
-        relay2
-        exit1
-        client
-    )
+    # nodes=(
+    #     authority
+    #     relay1
+    #     relay2
+    #     exit1
+    #     client
+    # )
 
-    total=0
+    # total=0
 
-    for node in "${nodes[@]}"; do
-        count=$(ssh $node "sh -c 'grep -l -R \"Bootstrapped 100%\" ~/Thesis/testing/logs/tor/*' | wc -l")
-        total=$((total + count))
-    done
+    # for node in "${nodes[@]}"; do
+    #     count=$(ssh $node "sh -c 'grep -l -R \"Bootstrapped 100%\" ~/Thesis/testing/logs/tor/*' | wc -l")
+    #     total=$((total + count))
+    # done
 
-    echo "$total"
+    echo $(grep -l -R "Bootstrapped 100%" ~/Documents/Thesis/testing/logs/tor/* | wc -l)
 }
 
 handle_args() {

@@ -2,9 +2,22 @@
 
 case "$1" in
 "r" | "run")
-    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/missing.jitterdummy.perf.yaml -v"
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/jitter.yaml -v"
     exit 0
     ;;
+"dummy")
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/configs/dummy.perf.yaml -v"
+    exit 0
+    ;;
+"jitter")
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/configs/jitter.perf.yaml -v"
+    exit 0
+    ;;
+"jd")
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/configs/jitterdummy.perf.yaml -v"
+    exit 0
+    ;;
+
 
 "t1")
     sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/control.perf.yaml -v | tee testing/scripts/tester/control.perf.log"

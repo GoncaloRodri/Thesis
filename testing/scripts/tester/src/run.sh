@@ -69,18 +69,18 @@ run_experiment() {
 
 save_logs() {
 
-    from=(
-        authority
-        relay1
-        relay2
-        exit1
-        client
-    )
+    # from=(
+    #     authority
+    #     relay1
+    #     relay2
+    #     exit1
+    #     client
+    # )
 
-    for node in "${from[@]}"; do
-        log_info "Copying logs from $node"
-        scp -r "$node:~/Thesis/testing/logs/tor/*" "/home/guga/Documents/Thesis/testing/logs/tor"
-    done
+    # for node in "${from[@]}"; do
+    #     log_info "Copying logs from $node"
+    #     scp -r "$node:~/Thesis/testing/logs/tor/*" "/home/guga/Documents/Thesis/testing/logs/tor"
+    # done
 
     log_success "Logs copied from machines successfully!"
 
@@ -183,7 +183,7 @@ run_combinations() {
                                         #SCHED - DIST - EPSILON - DUMMY - CLIENT_RATIO - FILESIZE
                                         totalC="$(echo "$CLIENTS_LIST" | jq -r ".[$i][0] + .[$i][1] + .[$i][2]")"
                                         name="$(echo "$SCHEDULER_LIST" | jq -r ".[$p]")-$(echo "$DP_DIST_LIST" | jq -r ".[$n]")-$(echo "$DP_EPSILON_LIST" | jq -r ".[$o]")-$(echo "$DUMMY_LIST" | jq -r ".[$j]")dum-${totalC}Clients-$file_size"
-                                        run_experiment "$name" "$TCP_DUMP_MODE" "$file_size" ""${CONFIG["end_test_at"]}"" "$client_params" "$tor_params"
+                                        run_experiment "$name" "$file_size" ""${CONFIG["end_test_at"]}"" "$client_params" "$tor_params"
                                     done
                                 done
                             done
