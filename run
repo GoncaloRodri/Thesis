@@ -2,7 +2,7 @@
 
 case "$1" in
 "r" | "run")
-    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/dummy.perf.yaml -v | tee testing/scripts/tester/dummy.perf.log"
+    sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/missing.jitterdummy.perf.yaml -v"
     exit 0
     ;;
 

@@ -22,7 +22,7 @@ launch_tor_network() {
     
     while true; do
         #COMPOSE_BAKE=true docker compose -f "$df" up -d
-        ssh authority docker stack deploy --detach=false -c Thesis/swarm.docker-compose.yml thesis
+        ssh authority docker stack deploy -q --detach=false -c Thesis/swarm.docker-compose.yml thesis
 
         local start end elapsed
 
@@ -32,6 +32,7 @@ launch_tor_network() {
 
         while [ $elapsed -lt $MAX_TIME_TO_BOOTSTRAP ]; do
             sleep "$BOOTSTRAP_SLEEP"
+            log_info "launch_tor_network()" "Checking if Tor Network is bootstrapped... ($elapsed s)"
             a=$(check_bootstrapped)
             if [ "$a" -eq $PERFORMANCE_BOOTSTRAP_COUNTER ]; then
                 break 2
@@ -51,7 +52,7 @@ launch_tor_network() {
         #docker compose -f "$df" down --remove-orphans
         ssh authority docker stack rm -d=false thesis
         echo
-        sleep 20
+        sleep 25
     done
 
     echo

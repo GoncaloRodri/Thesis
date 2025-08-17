@@ -16,12 +16,12 @@ verify_config
 
 for experiment in "${EXPERIMENTS[@]}"; do
     name=$(echo "$experiment" | jq -r '.name')
-    tcpdump_mode=$(echo "$experiment" | jq -r '.tcpdump_mode')
+    file_size=$(echo "$experiment" | jq -r '.filesize')
     end_test_at=$(echo "$experiment" | jq -r '.end_test_at')
     client_params=$(echo "$experiment" | jq -r '.clients')
     tor_params=$(echo "$experiment" | jq -r '.tor')
 
-    run_experiment "$name" "$tcpdump_mode" "$file_size" "${CONFIG["end_test_at"]}" "$client_params" "$tor_params"
+    run_experiment "$name" "$file_size" "${CONFIG["end_test_at"]}" "$client_params" "$tor_params"
 done
 
 run_combinations

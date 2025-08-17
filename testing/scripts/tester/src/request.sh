@@ -9,7 +9,7 @@ RANDOM_INTERVAL=5
 
 exec_curl() {
     local log_file="$2"
-    ssh client "curl --socks5 127.0.0.1:9000 -H 'Cache-Control: no-cache' -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null 54.36.191.12:5000/bytes/${1}" >>"$log_file"
+    ssh client "curl --socks5 127.0.0.1:9000 -s -H 'Cache-Control: no-cache' -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null 54.36.191.12:5000/bytes/${1}" >>"$log_file"
 }
 get_url() {
     #echo "http://ipv4.download.thinkbroadband.com/${1}.zip"

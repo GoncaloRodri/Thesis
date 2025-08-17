@@ -13,11 +13,10 @@ run_experiment() {
 
     repeat=${CONFIG["repeat"]}
     name="$1"
-    tcpdump_mode="$2"
-    file_size="$3"
-    end_test_at="$4"
-    client_params="$5"
-    tor_params="$6"
+    file_size="$2"
+    end_test_at="$3"
+    client_params="$4"
+    tor_params="$5"
 
     # Client Params
     bulk_clients=$(echo "$client_params" | jq -r '.bulk_clients')
@@ -79,8 +78,11 @@ save_logs() {
     )
 
     for node in "${from[@]}"; do
+        log_info "Copying logs from $node"
         scp -r "$node:~/Thesis/testing/logs/tor/*" "/home/guga/Documents/Thesis/testing/logs/tor"
     done
+
+    log_success "Logs copied from machines successfully!"
 
     logs_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}"
     if [ "$6" -gt 0 ]; then
@@ -88,20 +90,24 @@ save_logs() {
     else
         copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}$1-$2"
     fi
-    log_info "Copying logs to ${copy_dir}"
 
+    log_info "Copying cURL logs"
     mkdir -p "${copy_dir}"
     # Copy cURL logs
     if [ "$6" -le 0 ]; then
         cp -r "${logs_dir}curl.log" "${copy_dir}"
         rm -rf "${logs_dir}curl.log" || log_fatal "Failed to clean cURL logs directory: ${logs_dir}curl.log"
     fi
+
+    log_info "Copying Tor logs"
+
     # Copy Tor logs
     mkdir -p "${copy_dir}/tor"
     cp -r "${logs_dir}tor" "${copy_dir}"
 
     # Copy pcap logs
     if [ "$6" -gt 0 ]; then
+        log_info "Copying pcap logs"
         zip -r "${copy_dir}/$1.zip" "${logs_dir}wireshark/" || log_fatal "Failed to zip pcap logs"
     fi
 
