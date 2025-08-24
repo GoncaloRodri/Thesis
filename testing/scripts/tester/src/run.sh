@@ -69,20 +69,23 @@ run_experiment() {
 
 save_logs() {
 
-    # from=(
-    #     authority
-    #     relay1
-    #     relay2
-    #     exit1
-    #     client
-    # )
+    if [ ${CONFIG["local"]} = true ]; then
+        from=(
+            authority
+            relay1
+            relay2
+            exit1
+            client
+        )
 
-    # for node in "${from[@]}"; do
-    #     log_info "Copying logs from $node"
-    #     scp -r "$node:~/Thesis/testing/logs/tor/*" "/home/guga/Documents/Thesis/testing/logs/tor"
-    # done
+        for node in "${from[@]}"; do
+            log_info "Copying logs from $node"
+            scp -r "$node:~/Thesis/testing/logs/tor/*" "${CONFIG["absolute_path_dir"]}/testing/logs/tor"
+            scp -r "$node:~/Thesis/testing/logs/wireshark/*" "${CONFIG["absolute_path_dir"]}/testing/logs/wireshark"
+        done
 
-    log_success "Logs copied from machines successfully!"
+        log_success "Logs copied from machines successfully!"
+    fi
 
     logs_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}"
     if [ "$6" -gt 0 ]; then

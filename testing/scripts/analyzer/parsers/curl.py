@@ -18,7 +18,9 @@ def compute_metrics(stats: dict) -> dict:
         "std": float(np.std(stats)),
         "percentiles": {
             "10th": float(np.percentile(stats, 10)),
+            "25th": float(np.percentile(stats, 25)),
             "50th": float(np.percentile(stats, 50)),
+            "75th": float(np.percentile(stats, 75)),
             "90th": float(np.percentile(stats, 90)),
         },
     }

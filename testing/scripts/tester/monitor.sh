@@ -17,7 +17,6 @@ verify_config
 for experiment in "${EXPERIMENTS[@]}"; do
     name=$(echo "$experiment" | jq -r '.name')
     file_size=$(echo "$experiment" | jq -r '.filesize')
-    end_test_at=$(echo "$experiment" | jq -r '.end_test_at')
     client_params=$(echo "$experiment" | jq -r '.clients')
     tor_params=$(echo "$experiment" | jq -r '.tor')
 

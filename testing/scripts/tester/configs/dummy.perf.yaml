@@ -9,6 +9,7 @@ config:
   top_website_path: testing/resources/websites.txt
   clients: 9000
   end_test_at: 100
+  local: false
 
 combinations:
   filesize: ["51200", "1048576", "5242880"]

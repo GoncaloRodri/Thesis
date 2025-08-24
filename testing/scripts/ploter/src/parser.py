@@ -15,11 +15,7 @@ def parse_detailed(data):
             "name": name,
             "scheduler": scheduler,
             "epsilon": epsilon,
-            "distribution": (
-                "CONTROL"
-                if scheduler in ["KIST", "Vanilla"]
-                else entry["tor_params"].get("dp_distribution")
-            ),
+            "distribution": (entry["tor_params"].get("dp_distribution")),
             "clients": clients,
             "is_control": is_control,
             "dummy": entry["tor_params"].get("dummy"),
@@ -30,20 +26,26 @@ def parse_detailed(data):
             # LATENCY
             "latency": entry["latency"]["mean"],
             "latency_std_dev": entry["latency"]["stddev"],
-            "latency_50": entry["latency_p"]["50th"],
-            "latency_90": entry["latency_p"]["90th"],
             "latency_10": entry["latency_p"]["10th"],
+            "latency_25": entry["latency_p"]["25th"],
+            "latency_50": entry["latency_p"]["50th"],
+            "latency_75": entry["latency_p"]["75th"],
+            "latency_90": entry["latency_p"]["90th"],
             # THROUGHPUT
             "throughput": entry["throughput"]["mean"],
             "throughput_std_dev": entry["throughput"]["stddev"],
-            "throughput_50": entry["throughput_p"]["50th"],
             "throughput_10": entry["throughput_p"]["10th"],
+            "throughput_25": entry["throughput_p"]["25th"],
+            "throughput_50": entry["throughput_p"]["50th"],
+            "throughput_75": entry["throughput_p"]["75th"],
             "throughput_90": entry["throughput_p"]["90th"],
             # TOTAL TIME
             "total_time": entry["total_time"]["mean"],
             "total_time_std_dev": entry["total_time"]["stddev"],
-            "total_time_50": entry["total_time_p"]["50th"],
             "total_time_10": entry["total_time_p"]["10th"],
+            "total_time_25": entry["total_time_p"]["25th"],
+            "total_time_50": entry["total_time_p"]["50th"],
+            "total_time_75": entry["total_time_p"]["75th"],
             "total_time_90": entry["total_time_p"]["90th"],
             # JITTER
             "jitter": entry["jitter"]["mean"],
