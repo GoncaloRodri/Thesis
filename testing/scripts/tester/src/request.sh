@@ -27,7 +27,7 @@ start_tcpdump_on_relay() {
     if [ ${CONFIG["local"]} = true ]; then
         docker exec "thesis-${relay_name}-1" sh -c "(tcpdump -i eth0 -w /app/logs/wireshark/${relay_name}/${id}.pcap)" & 
     else
-        ssh "$1" sh -c "(tcpdump -i eth0 -w ~/Thesis/testing/logs/wireshark/${relay_name}/${id}.pcap)"
+        ssh -f "$1" "sudo tcpdump -i ens3 -w ~/Thesis/testing/logs/wireshark/${relay_name}/${id}.pcap"
     fi
 
 }
@@ -37,7 +37,7 @@ stop_tcpdump_on_relay() {
     if [ ${CONFIG["local"]} = true ]; then
         docker exec "thesis-${relay_name}-1" sh -c "pkill tcpdump"
     else
-        ssh "$1" sh -c "pkill tcpdump"
+        ssh "$1" "sudo pkill tcpdump"
     fi
 }
 
@@ -46,7 +46,7 @@ download_curl() {
     if [ ${CONFIG["local"]} = true ]; then
         curl --socks5 127.0.0.1:9000 -H 'Cache-Control: no-cache' -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null 10.5.0.200:5000/bytes/${1} >>"$log_file"
     else
-        ssh client "curl --socks5 127.0.0.1:9000 -H 'Cache-Control: no-cache' -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null 54.36.191.12:5000/bytes/${1}" >>"$log_file"
+        ssh client "curl --socks5 127.0.0.1:9000 --max_time 4 -H 'Cache-Control: no-cache' -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null 54.36.191.12:5000/bytes/${1}" >>"$log_file"
     fi
 }
 
