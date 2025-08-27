@@ -25,7 +25,7 @@ start_tcpdump_on_relay() {
     local relay_name="$1"
     local id="$2"
     if [ ${CONFIG["local"]} = true ]; then
-        docker exec "thesis-${relay_name}-1" sh -c "(tcpdump -i eth0 -w /app/logs/wireshark/${relay_name}/${id}.pcap)" & 
+        docker exec "thesis_${relay_name}_1" sh -c "(tcpdump -i eth0 -w /app/logs/wireshark/${relay_name}/${id}.pcap)" & 
     else
         ssh -f "$1" "sudo tcpdump -i ens3 -w ~/Thesis/testing/logs/wireshark/${relay_name}/${id}.pcap"
     fi
@@ -35,7 +35,7 @@ start_tcpdump_on_relay() {
 stop_tcpdump_on_relay() {
     local relay_name="$1"
     if [ ${CONFIG["local"]} = true ]; then
-        docker exec "thesis-${relay_name}-1" sh -c "pkill tcpdump"
+        docker exec "thesis_${relay_name}_1" sh -c "pkill tcpdump"
     else
         ssh "$1" "sudo pkill tcpdump"
     fi
@@ -53,9 +53,9 @@ download_curl() {
 browse_curl() {
     local log_file="$1"
     if [ ${CONFIG["local"]} = true ]; then
-        curl --socks5 127.0.0.1:9000 -H 'Cache-Control: no-cache' -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null ${2} >>"$log_file"
+        curl --socks5 127.0.0.1:9000 -H 'Cache-Control: no-cache' --max-time 3 -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null ${2} >>"$log_file"
     else
-        ssh client "curl --socks5 127.0.0.1:9000 --maxtime 4 -H 'Cache-Control: no-cache' -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null ${2}" >>"$log_file"
+        ssh client "curl --socks5 127.0.0.1:9000 --max-time 3 -H 'Cache-Control: no-cache' -w 'Code: %{response_code}\nTime to first byte: %{time_starttransfer}s\nTotal time: %{time_total}s\nDownload speed: %{speed_download} bytes/sec\n' -o /dev/null ${2}" >>"$log_file"
     fi
 }
 
@@ -73,11 +73,11 @@ run_localclient() {
     log_info "run_localclient()" "Executing $CURL_TEST_NUM cURL requests with filesize $filesize bytes..."
 
     for ((curl_i = 0; curl_i < $((CURL_TEST_NUM)); curl_i++)); do
-        echo -ne "⚠️ \e[33mExecuting Curl Requests [$curl_i of $CURL_TEST_NUM]\e[0m"\\r
+        echo -e "⚠️ \e[33mExecuting Curl Requests [$curl_i of $CURL_TEST_NUM]\e[0m"\\r
         download_curl "$filesize" "$log_file"
         sleep 1
     done
-    echo -ne "⚠️ \e[33mExecuting Curl Requests [100%]\e[0m"\\r
+    echo -e "⚠️ \e[33mExecuting Curl Requests [100%]\e[0m"\\r
     log_info "run_localclient()" "Executed $CURL_TEST_NUM cURL requests successfully!"
 }
 
@@ -99,8 +99,8 @@ run_topwebclient() {
         fi
         start_tcpdump "$name" "$url"
         log="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}curl_website.log"
-        echo "⚠️ \e[33mExecuting Curl Request [${url}]                   \e[0m"\\r
-        browse_curl "$url" "$log"
+        echo -e "⚠️ \e[33mExecuting Curl Request [${url}]                   \e[0m"
+        browse_curl "$log" "$url" || log_error "run_topwebclient()" "Failed to execute curl request for ${url}. Moving on..."
         sleep 1
         stop_tcpdump
     done

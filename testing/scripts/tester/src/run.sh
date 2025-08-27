@@ -28,9 +28,9 @@ run_experiment() {
         # Run the performance experiment
         log_info "Launching '$name-$ii'"
         if [ -n "$top_web_clients" ] && [ "$top_web_clients" -gt 0 ]; then
-            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/website-$name-$ii"
+            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/obs-$name-$ii"
         elif [ -n "$bulk_clients" ] && [ -n "$web_clients" ] && { [ "$bulk_clients" -gt 0 ] || [ "$web_clients" -gt 0 ]; }; then
-            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/$name-$ii"
+            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/perf-$name-$ii"
         fi
 
         log_info "Cleaning up Docker containers and images..."
@@ -47,11 +47,11 @@ run_experiment() {
 
         if [ -n "$top_web_clients" ] && [ "$top_web_clients" -gt 0 ]; then
             log_info "Starting Top Websites Clients Experiment..."
-            launch_topweb_clients "website-$name" "$ii"
+            launch_topweb_clients "obs-$name" "$ii"
             log_info "Bulk/Web Clients Experiment Completed!"
         elif [ -n "$bulk_clients" ] && [ -n "$web_clients" ] && { [ "$bulk_clients" -gt 0 ] || [ "$web_clients" -gt 0 ]; }; then
             log_info "Starting Bulk/Web Clients Experiment..."
-            launch_localclients "$name" "$file_size" "$ii"
+            launch_localclients "perf-$name" "$file_size" "$ii"
             log_info "Bulk/Web Clients Experiment Completed!"
         else
             # shellcheck disable=SC2140
@@ -68,8 +68,7 @@ run_experiment() {
 }
 
 save_logs() {
-
-    if [ ${CONFIG["local"]} = true ]; then
+    if [ ${CONFIG["local"]} = false ]; then
         from=(
             authority
             relay1
@@ -89,9 +88,9 @@ save_logs() {
 
     logs_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}"
     if [ "$6" -gt 0 ]; then
-        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}website-$1-$2"
+        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}obs-$1-$2"
     else
-        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}$1-$2"
+        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}perf-$1-$2"
     fi
 
     log_info "Copying cURL logs"
