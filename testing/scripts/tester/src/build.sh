@@ -9,7 +9,7 @@ source "${SCRIPT_DIR}/utils.sh"
 nodes=("authority" "relay1" "relay2" "exit1" "client")
 
 BOOTSTRAP_SLEEP=1
-MAX_TIME_TO_BOOTSTRAP=140
+MAX_TIME_TO_BOOTSTRAP=40
 PERFORMANCE_BOOTSTRAP_COUNTER=5
 DOCKER_COMPOSE_FILE="docker-compose.yml"
 
