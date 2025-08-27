@@ -111,6 +111,7 @@ save_logs() {
     if [ "$6" -gt 0 ]; then
         log_info "Copying pcap logs"
         zip -r "${copy_dir}/$1.zip" "${logs_dir}wireshark/" || log_fatal "Failed to zip pcap logs"
+        rm -rf "${logs_dir}wireshark/" || log_fatal "Failed to clean pcap logs directory: ${logs_dir}wireshark/"
     fi
 
     echo '{
