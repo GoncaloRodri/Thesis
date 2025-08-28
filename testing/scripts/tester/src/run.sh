@@ -34,15 +34,15 @@ run_experiment() {
         fi
 
         log_info "Cleaning up Docker containers and images..."
-        docker_clean
+        #docker_clean
         log_success "Docker cleanup Completed!\n"
 
         log_info "Setting up Torrc Configuration..."
-        set_configuration "$tor_params"
+        #set_configuration "$tor_params"
         log_success "Torrc Configuration Completed!\n"
 
         log_info "Launching Virtual Tor Network..."
-        launch_tor_network
+        #launch_tor_network
         log_success "Virtual Tor Network Launched!\n"
 
         if [ -n "$top_web_clients" ] && [ "$top_web_clients" -gt 0 ]; then
@@ -68,7 +68,7 @@ run_experiment() {
 }
 
 save_logs() {
-    if [ ${CONFIG["local"]} = false ]; then
+    if [ "${CONFIG["local"]}" = false ]; then
         from=(
             authority
             relay1

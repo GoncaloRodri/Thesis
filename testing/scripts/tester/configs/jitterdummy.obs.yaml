@@ -1,5 +1,5 @@
 config:
-  absolute_path: /home/ubuntu/thesis
+  absolute_path: /home/guga/Documents/Thesis
   repeat: 1
   copy_logs: true
   logs_dir: testing/logs/
@@ -16,11 +16,11 @@ combinations:
   clients:
     - [0, 0, 1]
   tor:
-    dummy: [0, 0.1, 0.25, 0.5, 1, 2.5, 5]
+    dummy: [0, 0.1, 0.5, 1]
     max_jitter: [10]
     min_jitter: [1]
     target_jitter: [2]
-    dp_distribution: ["LAPLACE", "POISSON", "EXPONENTIAL"]
-    dp_epsilon: [0, 0.1, 0.25, 0.5, 1, 2.5, 5]
+    dp_distribution: ["POISSON"]
+    dp_epsilon: [0, 0.1, 0.5, 1]
 
-    scheduler: ["PRIV_KIST", "PRIV_Vanilla"]
+    scheduler: ["PRIV_KIST"]

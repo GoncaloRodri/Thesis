@@ -20,14 +20,14 @@ log_info() {
 }
 
 log_error() {
-    echo -e "\a❌ \e[31mError: $1\e[0m ❌" >&2
+    echo -e "❌ \e[31mError: $1\e[0m ❌" >&2
     shift 1
     echo -e "   $*" >&2
 }
 
 log_warning() {
     if [[ "$VERBOSE" == true ]]; then
-        echo -e "\a⚠️ \e[33mWarning: $*\e[0m" >&2
+        echo -e "⚠️ \e[33mWarning: $*\e[0m" >&2
     fi
 }
 
