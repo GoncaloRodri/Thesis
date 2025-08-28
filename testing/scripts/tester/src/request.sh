@@ -10,7 +10,7 @@ RANDOM_INTERVAL=5
 
 start_tcpdump() {
     for container in "${CONTAINERS[@]}"; do
-        start_tcpdump_on_relay "$container" "$1" "$2" &
+        start_tcpdump_on_relay "$container" "$1" &
     done
     wait
 }
@@ -23,11 +23,11 @@ stop_tcpdump() {
 
 start_tcpdump_on_relay() {
     local relay_name="$1"
-    local id="$2"
+    local url="$2"
     if [ ${CONFIG["local"]} = true ]; then
-        docker exec "thesis_${relay_name}_1" sh -c "(tcpdump -i eth0 -w /app/logs/wireshark/${relay_name}/${id}.pcap)" & 
+        docker exec "thesis_${relay_name}_1" sh -c "(tcpdump -i eth0 -w /app/logs/wireshark/${relay_name}/${url}.pcap)" & 
     else
-        ssh -f "$1" "sudo tcpdump -i ens3 -w ~/Thesis/testing/logs/wireshark/${relay_name}/${id}.pcap"
+        ssh -f "$1" "sudo tcpdump -i ens3 -w ~/Thesis/testing/logs/wireshark/${relay_name}/${url}.pcap"
     fi
 
 }
@@ -97,7 +97,7 @@ run_topwebclient() {
             log_error "run_topwebclient()" "URL is empty, skipping..."
             continue
         fi
-        start_tcpdump "$name" "$url"
+        start_tcpdump "$url"
         log="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}curl_website.log"
         echo -e "⚠️ \e[33mExecuting Curl Request [${url}]                   \e[0m"
         browse_curl "$log" "$url" || log_error "run_topwebclient()" "Failed to execute curl request for ${url}. Moving on..."
