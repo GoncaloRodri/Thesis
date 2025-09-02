@@ -3,7 +3,10 @@ tmp
 scripts/ploter/*.png
 scripts/ploter/**/*.png
 
+collections/**/
+
 results/**/*.png
+results/**/*.json
 data
 
 # Ignore Python cache files
