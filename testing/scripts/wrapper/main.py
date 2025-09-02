@@ -3,24 +3,29 @@ import zipfile
 import shutil
 import sys
 import time
+import re
 
 # Input folder (contains subfolders with zips)
-BASE_DIR = "/home/guga/Documents/Thesis/testing/EMULATED_OBS_RESULTS"
+BASE_DIR = "/home/guga/Documents/Thesis/testing/collections/EMULATED_OBS_RESULTS"
 # Output folder
-OUTPUT_DIR = "/home/guga/Documents/Thesis/testing/collected"
+OUTPUT_DIR = "/home/guga/Documents/Thesis/testing/filtered_collections"
 # Websites file
 WEBSITES_FILE = "/home/guga/Documents/Thesis/testing/resources/websites.txt"
 
-INTERNAL_ZIP_DIR = "/home/ubuntu/Thesis/testing/logs/wireshark"
-
+INTERNAL_ZIP_DIR = "/testing/logs/wireshark"
+ALT_INTERNAL_ZIP_DIR = "/home/ubuntu/Thesis/testing/logs/wireshark"
 # Map each folder name to a sample number
 SAMPLE_MAP = {
-    "authority": 1,
-    "relay1": 2,
-    "relay2": 3,
-    "exit1": 4,
-    "client": 5
+    # "authority": 1,
+    # "relay1": 2,
+    # "relay2": 3,
+    "exit1": 0,
+    "client": 1,
 }
+
+SAMPLES_PER_WEBSITE = 50
+
+pattern = re.compile(r"^www\.([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+)_(\d+)\.pcap$")
 
 # Ensure output dir exists
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -43,7 +48,7 @@ print("-" * 60)
 def spinner():
     """Simple console spinner generator."""
     while True:
-        for cursor in "|/-\\":
+        for cursor in "||||||||||||////////////------------\\\\\\\\\\\\\\\\\\\\\\\\":
             yield cursor
 
 
@@ -90,35 +95,39 @@ for test_folder in os.listdir(BASE_DIR):
             for folder, sample_num in SAMPLE_MAP.items():
                 folder_path = f"{temp_dir}{INTERNAL_ZIP_DIR}/{folder}"
                 print(folder_path)
-                print(os.listdir(folder_path))
+                # print(os.listdir(folder_path))
                 if not os.path.exists(folder_path):
-                    print(f"   ⚠️ Folder '{folder}' not found inside zip, skipping.")
-                    continue
+                    print(
+                        f"   ⚠️ Folder '{folder}' not found inside zip, trying alternative folder structure."
+                    )
+                    folder_path = f"{temp_dir}{ALT_INTERNAL_ZIP_DIR}/{folder}"
+                    if not os.path.exists(folder_path):
+                        print(f"   ⚠️ Folder '{folder}' not found inside zip, skipping.")
+                        continue
 
-                print(f"   🔍 Looking into: {folder}")
+                dir_size = len(os.listdir(folder_path))
+                print(f"   🔍 Looking into: {folder} [{dir_size} files]")
 
                 for pcap_file in os.listdir(folder_path):
                     if not pcap_file.endswith(".pcap"):
                         continue
 
-                    base_name = os.path.splitext(pcap_file)[0]
+                    match = pattern.match(pcap_file)
 
-                    # Strip operator prefix (authority., relay1., etc.)
-                    if base_name.startswith(folder + "."):
-                        base_name = base_name[len(folder) + 1:]
-
-                    # Remove leading "www."
-                    if base_name.startswith("www."):
-                        website = base_name[4:]
+                    if match:
+                        website, id_num = match.groups()
                     else:
-                        website = base_name
+                        print(
+                            f"❌ Error: filename '{pcap_file}' does not match expected pattern 'www.[website]_[id].pcap'"
+                        )
+                        continue
 
                     if website not in website_to_index:
                         print(f"   ⚠️ Extracted website '{website}' not in {WEBSITES_FILE}, skipping.")
                         continue
 
                     index = website_to_index[website]
-                    new_name = f"{index}_{sample_num}.pcap"
+                    new_name = f"{index}_{int(sample_num)*SAMPLES_PER_WEBSITE+int(id_num)}.pcap"
                     src = os.path.join(folder_path, pcap_file)
                     test_output_dir = f"{OUTPUT_DIR}/{test_folder}"
                     os.makedirs(test_output_dir, exist_ok=True)

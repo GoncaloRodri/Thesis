@@ -3,7 +3,10 @@ tmp
 scripts/ploter/*.png
 scripts/ploter/**/*.png
 
+scripts/observer/wl-ml-attack/data/
+
 collections/**/
+filtered_collections/**/
 
 results/**/*.png
 results/**/*.json
