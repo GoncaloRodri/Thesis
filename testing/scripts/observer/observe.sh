@@ -1,14 +1,10 @@
 #!/bin/bash
 
-COLLECTION="EMULATED_OBS_RESULTS"
-SHOW_CLI=true
-
-COLLLECTIONS_DIRECTORY="/home/guga/Documents/Thesis/testing/collections"
+SOURCES_DIRECTORY="/home/guga/Documents/Thesis/testing/filtered_collections"
 DEST_FOLDER="/home/guga/Documents/Thesis/testing/results/observations"
 RESULTS_FOLDER="./data/results"
 PCAP_FOLDER="./data/pcaps"
-
-SOURCES_DIRECTORY="${COLLECTIONS_DIRECTORY}/${COLLECTION}"
+SHOW_CLI=false
 
 show_spinner() {
     local pid=$1
@@ -37,21 +33,17 @@ for SUB in "${SOURCES_DIRECTORY}"/*/; do
 
         echo "📂 Copying from $INPUT_FOLDER to $PCAP_FOLDER..."
         rm -rf ${PCAP_FOLDER}/*
-        cp -r "${SUB}"/* "${PCAP_FOLDER}/"
+        cp -r ${SUB}* ${PCAP_FOLDER}/
 
         echo "🚀 Running program..."
         mkdir -p "$SUB_RESULTS_FOLDER"
         cd src-ml
 
         if [ $SHOW_CLI = true ]; then
-            (sh -c ./main.sh 2>&1 | tee "$SUB_RESULTS_FOLDER/observer.log") &
+            (sh -c ./main.sh | tee "$SUB_RESULTS_FOLDER/observer.log")
         else
-            (sh -c ./main.sh >"$SUB_RESULTS_FOLDER/observer.log" 2>&1) &
+            (sh -c ./main.sh >"$SUB_RESULTS_FOLDER/observer.log")
         fi
-
-        PID=$!
-
-        show_spinner $PID
 
         cd ..
 
@@ -60,6 +52,8 @@ for SUB in "${SOURCES_DIRECTORY}"/*/; do
 
         echo "✅ Finished processing: $SUB_NAME"
     fi
+
+    exit 0
 
 done
 
