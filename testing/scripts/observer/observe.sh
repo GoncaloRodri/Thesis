@@ -1,10 +1,12 @@
 #!/bin/bash
 
-SOURCES_DIRECTORY="/home/guga/Documents/Thesis/testing/filtered_collections"
-DEST_FOLDER="/home/guga/Documents/Thesis/testing/results/observations"
+SOURCES_DIRECTORY="/home/ubuntu/Thesis/testing/filtered_collections"
+DEST_FOLDER="/home/ubuntu/Thesis/testing/results/observations"
 RESULTS_FOLDER="./data/results"
 PCAP_FOLDER="./data/pcaps"
-SHOW_CLI=false
+MODELS_FOLDER="./data/models"
+OUTPUT_PROGRAM_FOLDER="./data/output"
+SHOW_CLI=true
 
 show_spinner() {
     local pid=$1
@@ -19,7 +21,7 @@ show_spinner() {
     printf "\r✅ Program finished!          \n"
 }
 
-cd wf-ml-attack
+cd wf-pipeline
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -32,7 +34,11 @@ for SUB in "${SOURCES_DIRECTORY}"/*/; do
         echo "   Results added on $SUB_RESULTS_FOLDER"
 
         echo "📂 Copying from $INPUT_FOLDER to $PCAP_FOLDER..."
+
+        rm -rf ${MODELS_FOLDER}/*
         rm -rf ${PCAP_FOLDER}/*
+        rm -rf ${OUTPUT_PROGRAM_FOLDER}/*
+
         cp -r ${SUB}* ${PCAP_FOLDER}/
 
         echo "🚀 Running program..."
