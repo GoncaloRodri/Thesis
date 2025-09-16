@@ -1,0 +1,4 @@
+date      , source         , server, low, q1 , md , q3 , high
+2025-08-24, op-de8a        , public,  20,  70, 100, 140,  240
+2025-08-24, op-hk8a        , public, 370, 440, 480, 550,  710
+2025-08-24, op-us8a        , public, 190, 240, 260, 300,  390

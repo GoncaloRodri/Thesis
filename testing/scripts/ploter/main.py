@@ -14,6 +14,11 @@ THROUGHPUT_UNIT_CONVERSION = 0.008
 with open(f"{os.getcwd()}/testing/results/detailed_results.json") as f:
     data = json.load(f)
 
+pd.set_option("display.max_rows", None)  # show all rows
+pd.set_option("display.max_columns", None)  # show all columns
+pd.set_option("display.width", None)  # disable line wrapping
+pd.set_option("display.max_colwidth", None)  # show full column content
+
 # Unique DP distributions
 data = parser.parse_detailed(data)
 # Generate plots for each metric, for each DP distribution
@@ -76,7 +81,6 @@ df["total_time_90"] = pd.to_numeric(df["total_time_90"], errors="coerce")
 
 filesizes = df["filesize"].unique()
 metrics = [
-    "jitter",
     "latency_50",
     "throughput_50",
     "total_time_50",
@@ -90,22 +94,19 @@ plotter.plot_dummy_count(df, SHOW)
 plotter.plot_dummy_ratio(df, SHOW)
 plotter.plot_packet_count(df, SHOW)
 
+os.makedirs("testing/results/tables", exist_ok=True)
 for metric in metrics:
     for filesize in filesizes:
         plotter.plot_heatmap(metric, filesize, df, SHOW)
         plotter.plot_jitter(metric, filesize, df, SHOW)
-        plotter.plot_jitter_dummy(metric, filesize, df, SHOW)
         plotter.plot_dummy(metric, filesize, df, SHOW)
         for dist in distributions:
-            if dist == "CONTROL":
+            if dist == "NORMAL":
                 continue
             plotter.plot_jitter_by_distribution(metric, dist, filesize, df, SHOW)
 
         print(f"Overview Table for {metric} at filesize {filesize}")
-        tab = tabler.table_dummy(metric, filesize, df)
-        print(json.dumps(tab, indent=2))
-        print(json.dump(tab, open(f"table_{metric}_{filesize}.json", "w"), indent=2))
-
+        tabler.table_dummy(metric, filesize, df)
 
 print("Plots generated successfully.")
 exit(0)

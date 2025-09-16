@@ -17,8 +17,6 @@ case "$1" in
     sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/configs/jitterdummy.perf.yaml -v"
     exit 0
     ;;
-
-
 "t1")
     sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/control.perf.yaml -v | tee testing/scripts/tester/control.perf.log"
     sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/dummy.perf.yaml -v | tee testing/scripts/tester/dummy.perf.log"
@@ -64,6 +62,17 @@ case "$1" in
     sh -c "python3 testing/scripts/ploter/main.py"
     deactivate
     exit 0
+    ;;
+"w" | "wrap")
+    cd testing/scripts/wrapper
+    python3 main.py
+    cd -
+    exit 0
+    ;;
+"o" | "observe")
+    cd testing/scripts/observer
+    sh -c "./observe.sh"
+    exit 0 
     ;;
 "c" | "config")
     nano testing/scripts/tester/config.yaml

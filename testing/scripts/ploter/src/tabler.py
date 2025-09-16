@@ -1,3 +1,8 @@
+import json
+
+TEST_ENV = "local"
+
+
 def table_dummy(metric, filesize, data):
     res = {
         "control": {
@@ -20,7 +25,6 @@ def table_dummy(metric, filesize, data):
     for (sched, eps, dummy, file_size, dist, metric_val), group in data.groupby(
         ["scheduler", "epsilon", "dummy", "filesize", "distribution", metric]
     ):
-        # print(f"Processing {sched}, {eps}, {dummy}, {file_size}, {dist}, {metric_val}")
         if file_size != filesize:
             continue
         if eps < 0 and dummy < 0:
@@ -42,4 +46,11 @@ def table_dummy(metric, filesize, data):
             print("Unknown combination")
             exit(1)
 
-    return res
+    json.dump(
+        res,
+        open(
+            f"testing/results/tables/{TEST_ENV}_{metric}_{filesize}.json",
+            "w",
+        ),
+        indent=2,
+    )
