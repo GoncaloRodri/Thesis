@@ -69,7 +69,7 @@ get_logfile() {
 run_localclient() {
     local filesize="$2"
     CURL_TEST_NUM="${CONFIG["end_test_at"]}"
-
+    log_file="$(get_logfile)"
     log_info "run_localclient()" "Executing $CURL_TEST_NUM cURL requests with filesize $filesize bytes..."
 
     for ((curl_i = 0; curl_i < $((CURL_TEST_NUM)); curl_i++)); do
@@ -98,7 +98,7 @@ run_topwebclient() {
     starting_time=$(date +%s)
 
 
-    for sample in $(seq 1 50); do
+    for sample in $(seq 30 50); do
         for url in "${urls[@]}"; do
             step=$((step + 1))
             percentage=$((step * 100 / total_samples))

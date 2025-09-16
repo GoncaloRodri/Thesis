@@ -34,15 +34,15 @@ run_experiment() {
         fi
 
         log_info "Cleaning up Docker containers and images..."
-        #docker_clean
+        docker_clean
         log_success "Docker cleanup Completed!\n"
 
         log_info "Setting up Torrc Configuration..."
-        #set_configuration "$tor_params"
+        set_configuration "$tor_params"
         log_success "Torrc Configuration Completed!\n"
 
         log_info "Launching Virtual Tor Network..."
-        #launch_tor_network
+        launch_tor_network
         log_success "Virtual Tor Network Launched!\n"
 
         if [ -n "$top_web_clients" ] && [ "$top_web_clients" -gt 0 ]; then
@@ -79,8 +79,11 @@ save_logs() {
 
         for node in "${from[@]}"; do
             log_info "Copying logs from $node"
-            scp -r "$node:~/Thesis/testing/logs/tor/*" "${CONFIG["absolute_path_dir"]}/testing/logs/tor"
-            scp -r "$node:~/Thesis/testing/logs/wireshark/*" "${CONFIG["absolute_path_dir"]}/testing/logs/wireshark"
+            if [ "$6" -le 0 ]; then
+                scp -r "$node:~/Thesis/testing/logs/tor/*" "${CONFIG["absolute_path_dir"]}/testing/logs/tor/"
+            else
+                scp -r "$node:~/Thesis/testing/logs/wireshark/*" "${CONFIG["absolute_path_dir"]}/testing/logs/wireshark"
+            fi
         done
 
         log_success "Logs copied from machines successfully!"
@@ -111,7 +114,6 @@ save_logs() {
     if [ "$6" -gt 0 ]; then
         log_info "Copying pcap logs"
         zip -r "${copy_dir}/$1.zip" "${logs_dir}wireshark/" || log_fatal "Failed to zip pcap logs"
-        rm -rf "${logs_dir}wireshark/" || log_fatal "Failed to clean pcap logs directory: ${logs_dir}wireshark/"
     fi
 
     echo '{
