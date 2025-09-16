@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
+import seaborn as sns
 import os
+
+TEST_ENV = "local"
 
 
 def plot_dummy(metric, filesize, data, show=False):
@@ -15,12 +18,14 @@ def plot_dummy(metric, filesize, data, show=False):
 
         # __plot(ax, group_sorted["dummy"], group_sorted[metric], sched)
 
-        __fill_between(ax, "dummy", group_sorted, metric, sched, label=sched)
+        __fill_between(
+            ax, "dummy", group_sorted, metric, sched, label=f"{sched}-{dist}"
+        )
 
     if __draw_ax(
         ax,
         "Dummy Epsilon",
-        f"{metric.capitalize()} vs Dummy Epsilon ({get_file_sizes(filesize)})",
+        get_title("PPC", metric, filesize),
         metric,
         filesize,
     ):
@@ -30,7 +35,7 @@ def plot_dummy(metric, filesize, data, show=False):
         fig,
         metric,
         filesize,
-        "dummy",
+        "PPC",
         show,
     )
 
@@ -40,11 +45,7 @@ def plot_jitter_by_distribution(metric, dist, filesize, data, show=False):
     for (sched, dummy, file_size, distribution), group in data.groupby(
         ["scheduler", "dummy", "filesize", "distribution"]
     ):
-        if (
-            file_size != filesize
-            or distribution != dist != "CONTROL"
-            or float(dummy) >= 0
-        ):
+        if file_size != filesize or distribution != dist or float(dummy) >= 0:
             continue
 
         filtered_group = group[group["epsilon"] >= 0]
@@ -56,7 +57,7 @@ def plot_jitter_by_distribution(metric, dist, filesize, data, show=False):
     if __draw_ax(
         ax,
         "Jitter Induction Epsilon",
-        f"{metric.capitalize()} on {dist.capitalize()} Distribution ({get_file_sizes(filesize)})",
+        get_title(f"{distribution.capitalize()} Jitter Schedulers", metric, filesize),
         metric,
         filesize,
     ):
@@ -76,9 +77,9 @@ def plot_jitter(metric, filesize, data, show=False):
     for (sched, dummy, file_size, dist), group in data.groupby(
         ["scheduler", "dummy", "filesize", "distribution"]
     ):
-        if file_size != filesize or float(dummy) >= 0:
+        if file_size != filesize or float(dummy) >= 0 or dist == "NORMAL":
             continue
-        filtered_group = group[group["epsilon"] >= 0]
+        filtered_group = group[group["epsilon"] > 0]
         group_sorted = filtered_group.sort_values("epsilon")
         label = (
             f"{sched} | {dist.capitalize()}"
@@ -93,7 +94,7 @@ def plot_jitter(metric, filesize, data, show=False):
     if __draw_ax(
         ax,
         "Jitter Induction Epsilon",
-        f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})",
+        get_title("Jitter Induction Schedulers", metric, filesize),
         metric,
         filesize,
     ):
@@ -108,46 +109,40 @@ def plot_jitter(metric, filesize, data, show=False):
     )
 
 
-def plot_jitter_dummy(metric, filesize, data, show=False):
-    fig, ax = plt.subplots()
-    for (sched, file_size, dist), group in data.groupby(
-        ["scheduler", "filesize", "distribution"]
-    ):
-        if file_size != filesize or dist != "LAPLACE":
-            continue
-        filtered_group = group[(group["epsilon"] >= 0) & (group["dummy"] >= 0)]
-        group_sorted = filtered_group.sort_values("epsilon")
-        label = (
-            f"{sched} | {dist.capitalize()}"
-            if sched not in ["KIST", "Vanilla"]
-            else f"{sched}"
-        )
+def plot_heatmap(metric, filesize, data, show=False):
+    fig, ax = plt.subplots(figsize=(15, 10))
 
-        ax.scatter(
-            group_sorted["dummy"],
-            group_sorted["epsilon"],
-            c=group_sorted[metric],
-            cmap="coolwarm",
-            alpha=0.7,
-            marker="o",
-            label=label,
-            linestyle=get_line_style(sched),
-        )
+    filtered_data = data[
+        (data.epsilon > 0)
+        & (data.dummy >= 0)
+        & (data.scheduler == "PRIV_KIST")
+        & (data.distribution == "POISSON")
+        & (data.filesize == filesize)
+    ]
 
-    if not ax.collections:
-        plt.close(fig)
+    if filtered_data.empty:
+        print(f"No data available for filesize {filesize}")
         return
 
-    ax.set_title(f"{metric.capitalize()} vs Epsilon ({get_file_sizes(filesize)})")
-    ax.set_xlabel("Dummy Epsilon")
-    ax.set_ylabel("Jitter Induction Epsilon")
-    ax.legend(bbox_to_anchor=(1.05, 1))
-    ax.grid(True)
+    dupes = filtered_data.duplicated(subset=["dummy", "epsilon"], keep=False)
+    print(filtered_data[dupes])
+
+    pivot_table = filtered_data.pivot(index="dummy", columns="epsilon", values=metric)
+
+    ordered_table = pivot_table.sort_index().sort_index(axis=1)
+
+    ax = sns.heatmap(
+        ordered_table, annot=True, fmt=".3f", cmap="viridis", linewidths=0.5
+    )
+    ax.invert_yaxis()
+    ax.set_xlabel("Jitter Induction Epsilon")
+    ax.set_ylabel("PPC Epsilon")
+    ax.set_title(get_title("Both Features", metric, filesize))
     __save_fig(
-        fig,
+        plt.gcf(),
         metric,
         filesize,
-        f"jitter_dummy_{get_file_sizes(filesize).lower().replace(' ', '_')}",
+        "heatmap",
         show,
     )
 
@@ -174,9 +169,9 @@ def plot_dummy_count(data, show=False):
 
     if __draw_ax(
         ax,
-        "Packet Generation Epsilon",
-        "Nº of False Cells Created",
-        "dummy_count",
+        "PPC Epsilon",
+        "Nº of False Cells Generated",
+        "Generated Cells",
         file_size,
     ):
         print(f"No data to plot for dummy count with file size {file_size}")
@@ -184,9 +179,9 @@ def plot_dummy_count(data, show=False):
 
     __save_fig(
         fig,
-        "dummy_count",
+        "PPC_count",
         "",
-        "dummy_count",
+        "PPC_count",
         show,
     )
 
@@ -207,7 +202,7 @@ def plot_dummy_ratio(data, show=False):
             ax,
             group_sorted["dummy"],
             [
-                d / (cell)
+                (d / (cell)) * 100
                 for d, cell in zip(
                     group_sorted["total_dummies"], group_sorted["total_cells"]
                 )
@@ -218,8 +213,8 @@ def plot_dummy_ratio(data, show=False):
 
     if __draw_ax(
         ax,
-        "Packet Generation Epsilon",
-        "Total Cells vs Cell Generation Epsilon",
+        "PPC Epsilon",
+        "PPC False Cells Ratio",
         "dummy_ratio",
         file_size,
     ):
@@ -228,7 +223,7 @@ def plot_dummy_ratio(data, show=False):
 
     __save_fig(
         fig,
-        "dummy_ratio",
+        "PPC Ratio",
         file_size,
         "dummy_ratio",
         show,
@@ -258,9 +253,9 @@ def plot_packet_count(data, show=False):
 
     if __draw_ax(
         ax,
-        "Packet Generation Epsilon",
-        "TLS Packet Count",
-        "dummy_count",
+        "PPC Epsilon",
+        "Nº TLS Packets",
+        "TLS Packets",
         file_size,
     ):
         print(f"No data to plot for dummy count with file size {file_size}")
@@ -303,7 +298,7 @@ def __draw_ax(ax, x_label, title, metric, file_size):
 
     ax.set_title(title)
     ax.set_xlabel(x_label)
-    ax.set_ylabel(get_units(metric))
+    ax.set_ylabel(get_axis_label(metric))
     ax.legend(loc="best", bbox_to_anchor=(1.05, 1))
     ax.grid(True)
     return False
@@ -316,8 +311,8 @@ def __save_fig(fig, metric, file_size, file_name, show=False):
     path = f"{abs_path()}/{metric}"
     os.makedirs(path, exist_ok=True)
     fig.savefig(
-        f"{path}/{file_name}_{get_file_sizes(file_size).lower().replace(' ', '_')}.png",
-        dpi=300,
+        f"{path}/{TEST_ENV}_{metric}_{file_name}_{get_file_sizes(file_size).lower().replace(' ', '')}.png",
+        dpi=400,
         bbox_inches="tight",
     )
     if show:
@@ -342,9 +337,8 @@ def __fill_between(ax, variable, group_sorted, metric, sched, label=""):
         return
 
     if "_50" in metric:
-        print(f"Filling between percentiles for {metric}")
-        metric_10 = metric.replace("50", "10")
-        metric_90 = metric.replace("50", "90")
+        metric_10 = metric.replace("50", "25")
+        metric_90 = metric.replace("50", "75")
 
         ax.plot(
             group_sorted[variable],
@@ -409,6 +403,47 @@ def get_line_style(scheduler):
         if scheduler in ["PRIV_KIST", "DP_KIST"]
         else "-" if scheduler in ["PRIV_Vanilla", "DP_Vanilla"] else ":"
     )
+
+
+def get_title(feature, metric, filesize):
+    if "PPC" not in feature:
+        feature = f"{feature.capitalize()}"
+
+    if "latency" in metric:
+        return f"{feature} Latency ({get_file_sizes(filesize)})"
+    elif "throughput" in metric:
+        return f"{feature} Throughput ({get_file_sizes(filesize)})"
+    elif "jitter" in metric:
+        return f"{feature} Jitter ({get_file_sizes(filesize)})"
+    elif "total_time" in metric:
+        return f"{feature} Total Time ({get_file_sizes(filesize)})"
+    elif "total_dummy" in metric:
+        return f"{feature} False Cells ({get_file_sizes(filesize)})"
+    elif "dummy_ratio" in metric:
+        return f"{feature} False Cells Ratio ({get_file_sizes(filesize)})"
+    elif "packet_count" in metric:
+        return f"{feature} Total TLS Packet Count ({get_file_sizes(filesize)})"
+    else:
+        return metric
+
+
+def get_axis_label(metric):
+    if "latency" in metric:
+        return "Latency (ms)"
+    elif "throughput" in metric:
+        return "Throughput (Kbps)"
+    elif "jitter" in metric:
+        return "Jitter"
+    elif "total_time" in metric:
+        return "Total Time Elapsed (s)"
+    elif "total_dummy" in metric:
+        return "Nº of False Cells"
+    elif "dummy_ratio" in metric:
+        return "False Cells Ratio (%)"
+    elif "packet_count" in metric:
+        return "Nº of TLS Packets"
+    else:
+        return metric
 
 
 def get_units(metric):

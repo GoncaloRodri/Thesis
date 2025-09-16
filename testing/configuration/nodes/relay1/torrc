@@ -2,5 +2,5 @@
 %include /app/conf/tor.relay.torrc
 %include /app/conf/tor.non-exit.torrc
 
-Address 10.0.1.42
+Address 10.5.0.2
 Nickname relay1

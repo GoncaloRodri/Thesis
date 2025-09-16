@@ -9,20 +9,31 @@ source "${SCRIPT_DIR}/utils.sh"
 nodes=("authority" "relay1" "relay2" "exit1" "client")
 
 BOOTSTRAP_SLEEP=1
-MAX_TIME_TO_BOOTSTRAP=10
+MAX_TIME_TO_BOOTSTRAP=40
 PERFORMANCE_BOOTSTRAP_COUNTER=5
-DOCKER_COMPOSE_FILE="swarm.docker-compose.yml"
+DOCKER_COMPOSE_FILE="docker-compose.yml"
+
 
 launch_tor_network() {
 
-    for node in "${nodes[@]}"; do
-        ssh "$node" "sudo systemctl restart docker"
-    done
-    sleep 10
-    
+    elapsed_to_complete=$(date +%s)
+    tests_counter=0
+
+    if [ "${CONFIG[local]}" = false ]; then
+        for node in "${nodes[@]}"; do
+            ssh "$node" "sudo systemctl restart docker"
+        done
+        sleep 10
+    fi
+
     while true; do
-        #COMPOSE_BAKE=true docker compose -f "$df" up -d
-        ssh authority docker stack deploy -q --detach=false -c Thesis/swarm.docker-compose.yml thesis
+        if [ "${CONFIG[local]}" = true ]; then
+            COMPOSE_BAKE=true docker-compose up -d
+        else
+            ssh authority docker stack deploy -q --detach=false -c Thesis/swarm.docker-compose.yml thesis
+        fi
+    
+        tests_counter=$((tests_counter + 1))
 
         local start end elapsed
 
@@ -30,43 +41,53 @@ launch_tor_network() {
         end=$(date +%s)
         elapsed=$((end - start))
 
-        while [ $elapsed -lt $MAX_TIME_TO_BOOTSTRAP ]; do
-            sleep "$BOOTSTRAP_SLEEP"
-            log_info "launch_tor_network()" "Checking if Tor Network is bootstrapped... ($elapsed s)"
+        a=0
+        sleep 20
+
+
+        while { [ $elapsed -lt $MAX_TIME_TO_BOOTSTRAP ] && { [ "$a" -ne 0 ] || [ "$elapsed" -lt 20 ]; }; }; do
+            if [ ${CONFIG["local"]} = true ]; then
+                sleep $BOOTSTRAP_SLEEP
+            fi
+
             a=$(check_bootstrapped)
+
+            end=$(date +%s)
+            elapsed=$((end - start))
+            
             if [ "$a" -eq $PERFORMANCE_BOOTSTRAP_COUNTER ]; then
+                elapsed_to_complete=$(($(date +%s) - elapsed_to_complete))
+                echo "Test Nº $tests_counter: $elapsed secs of $elapsed_to_complete secs" >> elapsed_to_complete.log
                 break 2
             fi
 
-            if [ "$a" -eq 0 ]; then
-                break 1
-            fi 
-            end=$(date +%s)
-            elapsed=$((end - start))
             if [[ "$VERBOSE" == true ]]; then
                 echo -ne "⚠️ \e[33mWarning: Tor Network is not bootstrapped yet! ($a of $PERFORMANCE_BOOTSTRAP_COUNTER) [$elapsed s]\e[0m"\\r
             fi
         done
         echo 
         log_error "launch_tor_network()                                             " "Tor Network failed to bootstrap within $MAX_TIME_TO_BOOTSTRAP seconds. Retrying..."
-        #docker compose -f "$df" down --remove-orphans
-        ssh authority docker stack rm -d=false thesis
+        docker_clean
         echo
         sleep 25
     done
 
-    echo
+    echo ""
 }
 
 docker_clean() {
-    ssh authority docker stack rm -d=false thesis
+    if [ "${CONFIG[local]}" = true ]; then
+        docker-compose down
+    else
+        ssh authority docker stack rm -d=false thesis
+    fi
 }
 
 set_configuration() {
     local params config_path dummy min_j max_j sched target_j dp_dist dp_epsilon
 
     params="$1"
-    config_path="${CONFIG["absolute_path_dir"]}/${CONFIG["configuration_dir"]}"
+    config_path="${CONFIG[absolute_path_dir]}/${CONFIG[configuration_dir]}"
 
     dummy=$(echo "$params" | jq -r '.dummy')
     min_j=$(echo "$params" | jq -r '.min_jitter')
@@ -76,20 +97,21 @@ set_configuration() {
     dp_dist=$(echo "$params" | jq -r '.dp_distribution')
     dp_epsilon=$(echo "$params" | jq -r '.dp_epsilon')
 
-    sed -i "s/^Schedulers .*/Schedulers ${sched}/" "${config_path}"tor.common.torrc
+    sed -i "s/^Schedulers .*/Schedulers ${sched}/" "${config_path}tor.common.torrc"
 
-    sed -i "s/^PrivSchedulerDistribution .*/PrivSchedulerDistribution ${dp_dist}/" "${config_path}"tor.common.torrc
-    sed -i "s/^PrivSchedulerEpsilon .*/PrivSchedulerEpsilon ${dp_epsilon}/" "${config_path}"tor.common.torrc
+    sed -i "s/^PrivSchedulerDistribution .*/PrivSchedulerDistribution ${dp_dist}/" "${config_path}tor.common.torrc"
+    sed -i "s/^PrivSchedulerEpsilon .*/PrivSchedulerEpsilon ${dp_epsilon}/" "${config_path}tor.common.torrc"
 
-    sed -i "s/^PrivSchedulerMinJitter .*/PrivSchedulerMinJitter ${min_j}/" "${config_path}"tor.common.torrc
-    sed -i "s/^PrivSchedulerMaxJitter .*/PrivSchedulerMaxJitter ${max_j}/" "${config_path}"tor.common.torrc
-    sed -i "s/^PrivSchedulerTargetJitter .*/PrivSchedulerTargetJitter ${target_j}/" "${config_path}"tor.common.torrc
+    sed -i "s/^PrivSchedulerMinJitter .*/PrivSchedulerMinJitter ${min_j}/" "${config_path}tor.common.torrc"
+    sed -i "s/^PrivSchedulerMaxJitter .*/PrivSchedulerMaxJitter ${max_j}/" "${config_path}tor.common.torrc"
+    sed -i "s/^PrivSchedulerTargetJitter .*/PrivSchedulerTargetJitter ${target_j}/" "${config_path}tor.common.torrc"
 
-    sed -i "s/^DummyCellEpsilon .*/DummyCellEpsilon ${dummy}/" "${config_path}"tor.common.torrc
+    sed -i "s/^DummyCellEpsilon .*/DummyCellEpsilon ${dummy}/" "${config_path}tor.common.torrc"
 
-    for node in "${nodes[@]}"; do
-        log_info "set_configuration()" "Setting configuration for $node"
-        scp -r "${config_path}" "$node:/home/ubuntu/Thesis/testing/"
-    done
-
+    if [ "${CONFIG[local]}" = false ]; then
+        for node in "${nodes[@]}"; do
+            log_info "set_configuration()" "Setting configuration for $node"
+            scp -r "${config_path}" "$node:/home/ubuntu/Thesis/testing/"
+        done
+    fi
 }

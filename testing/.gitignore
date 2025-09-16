@@ -3,7 +3,13 @@ tmp
 scripts/ploter/*.png
 scripts/ploter/**/*.png
 
+scripts/observer/wl-ml-attack/data/
+
+collections/**/
+filtered_collections/**/
+
 results/**/*.png
+results/**/*.json
 data
 
 # Ignore Python cache files
@@ -15,3 +21,5 @@ __pycache__
 # Ignore virtual environments
 venv
 .env
+
+*PERF*

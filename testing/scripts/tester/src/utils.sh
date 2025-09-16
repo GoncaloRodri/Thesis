@@ -20,14 +20,14 @@ log_info() {
 }
 
 log_error() {
-    echo -e "\a❌ \e[31mError: $1\e[0m ❌" >&2
+    echo -e "❌ \e[31mError: $1\e[0m ❌" >&2
     shift 1
     echo -e "   $*" >&2
 }
 
 log_warning() {
     if [[ "$VERBOSE" == true ]]; then
-        echo -e "\a⚠️ \e[33mWarning: $*\e[0m" >&2
+        echo -e "⚠️ \e[33mWarning: $*\e[0m" >&2
     fi
 }
 
@@ -51,7 +51,7 @@ load_config() {
     # Load base config
     CONFIG+=(
         ["repeat"]=$(yq eval '.config.repeat' "$config_file")
-        ["clients"]=$(yq eval '.config.clients' "$config_file")
+        ["local"]=$(yq eval '.config.local' "$config_file")
         ["logs_dir"]=$(yq eval '.config.logs_dir' "$config_file")
         ["copy_logs"]=$(yq eval '.config.copy_logs' "$config_file")
         ["docker_dir"]=$(yq eval '.config.docker_dir' "$config_file")
@@ -76,14 +76,14 @@ load_config() {
 
 show_help() {
     cat <<EOF
-Experimental Runner v1.0
+Experimental Runner v2.0 by GoncaloRodri
 
 Usage: ./monitor.sh -c CONFIG_FILE [OPTIONS]
 
 Options:
   -c, --config FILE    Specify YAML config file (required)
   -v, --verbose        Enable verbose output
-  -h, --help           Show this help message
+  -h, --help           Show this help message and exits
 
 Config File Structure:
   config:
@@ -94,47 +94,67 @@ Config File Structure:
     docker_dir: string
     copy_target: string
     configuration_dir: string
+    end_test_at: uint
+    local: boolean
   
   experiments:
     - name: string
-      end_test_at: uint
-      tcpdump_mode: bool
-      filesize: ["5KB" | "1MB" | "5MB"]
+      filesize: string 
       tor:
-        dummy: [0-100]
+        dummy: float
         max_jitter: [0-inf]
         min_jitter: [0-max_jitter]
         target_jitter: [min_jitter-max_jitter]
-        dp_distribution: ["UNIFORM" | "EXPONENTIAL"]
-        dp_epsilon: [0.0-1.0]
-        scheduler: ["Vanilla" | "KIST" | "DPVanilla" | "DPKist" ]
+        dp_distribution: [ "LAPLACE" | "POISSON" | "NORMAL" | "UNIFORM" | "EXPONENTIAL" ]
+        dp_epsilon: float
+        scheduler: [ "Vanilla" | "KIST" | "PRIV_Vanilla" | "PRIV_KIST" ]
       clients:
         bulk_clients: uint
         web_clients: uint
         top_web_clients: uint
+
+  combinations:
+    filesize: string[]
+    clients:
+      - [uint, uint, uint] # [bulk_clients, web_clients, top_web_clients]
+    tor:
+      dummy: float[]
+      max_jitter: uint[]
+      min_jitter: uint[]
+      target_jitter: uint[]
+      dp_distribution: dp_distribution[]
+      dp_epsilon: float[]
+      scheduler: scheduler[]
+
 EOF
+
 }
 
 check_bootstrapped() {
-    logs_path="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}tor/*"
-    # shellcheck disable=SC2086
+    if [ "${CONFIG[local]}" = false ]; then
+        nodes=(
+            authority
+            relay1
+            relay2
+            exit1
+            client
+        )
 
-    nodes=(
-        authority
-        relay1
-        relay2
-        exit1
-        client
-    )
+        total=0
 
-    total=0
+        for node in "${nodes[@]}"; do
+            count=$(ssh $node "sh -c 'grep -l -R \"Bootstrapped 100%\" ~/Thesis/testing/logs/tor/*' | wc -l")
+            total=$((total + count))
+        done
 
-    for node in "${nodes[@]}"; do
-        count=$(ssh $node "sh -c 'grep -l -R \"Bootstrapped 100%\" ~/Thesis/testing/logs/tor/*' | wc -l")
-        total=$((total + count))
-    done
+        echo "$total"
+    else 
+        echo $(grep -l -R "Bootstrapped 100%" ~/Thesis/testing/logs/tor/* | wc -l)
+    fi
 
-    echo "$total"
+    
+
+    
 }
 
 handle_args() {
@@ -215,46 +235,4 @@ verify_config() {
     fi
 
     log_success "Configuration verified successfully."
-}
-
-debug_running_processes() {
-    local name="$1"
-    log_info "=== DEBUG: Checking running processes for test: $name ==="
-
-    # Check for curl processes
-    echo "Curl processes:"
-    pgrep -f curl || echo "No curl processes found"
-
-    # Check for bash processes (your client scripts)
-    echo "Client script processes:"
-    pgrep -f "run_webclient\|run_bulkclient" || echo "No client script processes found"
-
-    # Check for timeout processes
-    echo "Timeout processes:"
-    pgrep -f timeout || echo "No timeout processes found"
-}
-
-cleanup_test_processes() {
-    local name="$1"
-    log_info "Cleaning up processes for test: $name"
-
-    # Kill curl processes
-    pkill -f curl 2>/dev/null || true
-
-    # Kill timeout processes
-    pkill -f timeout 2>/dev/null || true
-
-    # Kill client script processes
-    pkill -f "run_webclient\|run_bulkclient" 2>/dev/null || true
-
-    #kill -KILL $(pgrep bash)
-
-    # Clean up Docker container processes
-    for container in "${CONTAINERS[@]}"; do
-        docker exec "thesis-${container}-1" pkill -f curl 2>/dev/null || true
-        docker exec "thesis-${container}-1" pkill -f bash 2>/dev/null || true
-    done
-
-    # Wait a bit for cleanup
-    sleep 2
 }

@@ -3,6 +3,8 @@ DataDirectory .
 Log info stdout
 AssumeReachable 1
 
+# Uncomment one of the 2 two lines below for local or distributed environment, respectivly
+#DirAuthority authority orport=9001 v3ident=251A6199439061376DBDEB65848324E2D5EC89C7 10.5.0.255:9030 A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1
 DirAuthority authority orport=9001 v3ident=251A6199439061376DBDEB65848324E2D5EC89C7 54.36.191.12:9030 A52CA5B56C64D864F6AE43E56F29ACBD5706DDA1
 
 ControlPort 9051
@@ -25,7 +27,7 @@ BandwidthBurst 1024000
 Schedulers PRIV_KIST
 
 ######### Differential Privacy #########
-PrivSchedulerEpsilon -1
+PrivSchedulerEpsilon 0.01
 PrivSchedulerDistribution LAPLACE
 
 ################ Jitter ################
@@ -34,4 +36,4 @@ PrivSchedulerMaxJitter 10
 PrivSchedulerTargetJitter 2
 
 ######### Packet Cell Padding ##########
-DummyCellEpsilon 0
+DummyCellEpsilon -1

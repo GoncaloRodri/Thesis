@@ -6,7 +6,7 @@ def get_config():
         "curl_logs_folder": "curl",
         "tor_logs_folder": "tor",
         "pcap_logs_folder": "pcap",
-        "logs_dir": f"{os.getcwd()}/testing/data",
+        "logs_dir": f"{os.getcwd()}/testing/EU-DIST-PERF/",
     }
 
 

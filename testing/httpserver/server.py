@@ -3,6 +3,7 @@ import os
 
 app = Flask(__name__)
 
+
 @app.route('/bytes/<int:size>')
 def random_bytes(size):
     data = os.urandom(size)

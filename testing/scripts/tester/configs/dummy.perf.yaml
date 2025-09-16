@@ -1,5 +1,5 @@
 config:
-  absolute_path: /home/ubuntu/thesis
+  absolute_path: /home/ubuntu/Thesis
   repeat: 1
   copy_logs: true
   logs_dir: testing/logs/
@@ -9,6 +9,7 @@ config:
   top_website_path: testing/resources/websites.txt
   clients: 9000
   end_test_at: 100
+  local: false
 
 combinations:
   filesize: ["51200", "1048576", "5242880"]

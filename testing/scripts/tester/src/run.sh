@@ -28,9 +28,9 @@ run_experiment() {
         # Run the performance experiment
         log_info "Launching '$name-$ii'"
         if [ -n "$top_web_clients" ] && [ "$top_web_clients" -gt 0 ]; then
-            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/website-$name-$ii"
+            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/obs-$name-$ii"
         elif [ -n "$bulk_clients" ] && [ -n "$web_clients" ] && { [ "$bulk_clients" -gt 0 ] || [ "$web_clients" -gt 0 ]; }; then
-            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/$name-$ii"
+            mkdir -p "${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}/perf-$name-$ii"
         fi
 
         log_info "Cleaning up Docker containers and images..."
@@ -47,11 +47,11 @@ run_experiment() {
 
         if [ -n "$top_web_clients" ] && [ "$top_web_clients" -gt 0 ]; then
             log_info "Starting Top Websites Clients Experiment..."
-            launch_topweb_clients "website-$name" "$ii"
+            launch_topweb_clients "obs-$name" "$ii"
             log_info "Bulk/Web Clients Experiment Completed!"
         elif [ -n "$bulk_clients" ] && [ -n "$web_clients" ] && { [ "$bulk_clients" -gt 0 ] || [ "$web_clients" -gt 0 ]; }; then
             log_info "Starting Bulk/Web Clients Experiment..."
-            launch_localclients "$name" "$file_size" "$ii"
+            launch_localclients "perf-$name" "$file_size" "$ii"
             log_info "Bulk/Web Clients Experiment Completed!"
         else
             # shellcheck disable=SC2140
@@ -68,27 +68,32 @@ run_experiment() {
 }
 
 save_logs() {
+    if [ "${CONFIG["local"]}" = false ]; then
+        from=(
+            authority
+            relay1
+            relay2
+            exit1
+            client
+        )
 
-    from=(
-        authority
-        relay1
-        relay2
-        exit1
-        client
-    )
+        for node in "${from[@]}"; do
+            log_info "Copying logs from $node"
+            if [ "$6" -le 0 ]; then
+                scp -r "$node:~/Thesis/testing/logs/tor/*" "${CONFIG["absolute_path_dir"]}/testing/logs/tor/"
+            else
+                scp -r "$node:~/Thesis/testing/logs/wireshark/*" "${CONFIG["absolute_path_dir"]}/testing/logs/wireshark"
+            fi
+        done
 
-    for node in "${from[@]}"; do
-        log_info "Copying logs from $node"
-        scp -r "$node:~/Thesis/testing/logs/tor/*" "/home/guga/Documents/Thesis/testing/logs/tor"
-    done
-
-    log_success "Logs copied from machines successfully!"
+        log_success "Logs copied from machines successfully!"
+    fi
 
     logs_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["logs_dir"]}"
     if [ "$6" -gt 0 ]; then
-        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}website-$1-$2"
+        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}obs-$1-$2"
     else
-        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}$1-$2"
+        copy_dir="${CONFIG["absolute_path_dir"]}/${CONFIG["data_dir"]}perf-$1-$2"
     fi
 
     log_info "Copying cURL logs"
@@ -183,7 +188,7 @@ run_combinations() {
                                         #SCHED - DIST - EPSILON - DUMMY - CLIENT_RATIO - FILESIZE
                                         totalC="$(echo "$CLIENTS_LIST" | jq -r ".[$i][0] + .[$i][1] + .[$i][2]")"
                                         name="$(echo "$SCHEDULER_LIST" | jq -r ".[$p]")-$(echo "$DP_DIST_LIST" | jq -r ".[$n]")-$(echo "$DP_EPSILON_LIST" | jq -r ".[$o]")-$(echo "$DUMMY_LIST" | jq -r ".[$j]")dum-${totalC}Clients-$file_size"
-                                        run_experiment "$name" "$TCP_DUMP_MODE" "$file_size" ""${CONFIG["end_test_at"]}"" "$client_params" "$tor_params"
+                                        run_experiment "$name" "$file_size" ""${CONFIG["end_test_at"]}"" "$client_params" "$tor_params"
                                     done
                                 done
                             done
