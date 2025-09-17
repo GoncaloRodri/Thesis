@@ -10,6 +10,8 @@ filtered_collections/**/
 
 results/**/*.png
 results/**/*.json
+results/observations
+
 data
 
 # Ignore Python cache files
