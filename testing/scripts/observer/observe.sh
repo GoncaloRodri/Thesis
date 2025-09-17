@@ -48,7 +48,7 @@ for SUB in "${SOURCES_DIRECTORY}"/*/; do
         cd ..
 
         echo ""📦 Saving results...""
-        mv -r "$RESULTS_FOLDER/*" "$SUB_RESULTS_FOLDER"/
+        mv "$RESULTS_FOLDER" "$SUB_RESULTS_FOLDER"/
 
         echo "✅ Finished processing: $SUB_NAME"
     fi

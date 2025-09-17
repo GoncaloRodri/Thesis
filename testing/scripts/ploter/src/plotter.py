@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-TEST_ENV = "local"
+TEST_ENV = "dist"
 
 
 def plot_dummy(metric, filesize, data, show=False):
@@ -57,7 +57,7 @@ def plot_jitter_by_distribution(metric, dist, filesize, data, show=False):
     if __draw_ax(
         ax,
         "Jitter Induction Epsilon",
-        get_title(f"{distribution.capitalize()} Jitter Schedulers", metric, filesize),
+        get_title(f"{distribution.capitalize()} Distribution", metric, filesize),
         metric,
         filesize,
     ):
@@ -94,7 +94,7 @@ def plot_jitter(metric, filesize, data, show=False):
     if __draw_ax(
         ax,
         "Jitter Induction Epsilon",
-        get_title("Jitter Induction Schedulers", metric, filesize),
+        get_title("Schedulers", metric, filesize),
         metric,
         filesize,
     ):
@@ -170,7 +170,7 @@ def plot_dummy_count(data, show=False):
     if __draw_ax(
         ax,
         "PPC Epsilon",
-        "Nº of False Cells Generated",
+        "Nº of False Cells",
         "Generated Cells",
         file_size,
     ):
@@ -299,7 +299,7 @@ def __draw_ax(ax, x_label, title, metric, file_size):
     ax.set_title(title)
     ax.set_xlabel(x_label)
     ax.set_ylabel(get_axis_label(metric))
-    ax.legend(loc="best", bbox_to_anchor=(1.05, 1))
+    ax.legend(loc="best", bbox_to_anchor=(1, 1))
     ax.grid(True)
     return False
 
@@ -407,22 +407,22 @@ def get_line_style(scheduler):
 
 def get_title(feature, metric, filesize):
     if "PPC" not in feature:
-        feature = f"{feature.capitalize()}"
+        feature = f"{feature.title()}"
 
     if "latency" in metric:
-        return f"{feature} Latency ({get_file_sizes(filesize)})"
+        return f"{feature} Latency (ms)"
     elif "throughput" in metric:
-        return f"{feature} Throughput ({get_file_sizes(filesize)})"
+        return f"{feature} Throughput (Mbps)"
     elif "jitter" in metric:
-        return f"{feature} Jitter ({get_file_sizes(filesize)})"
+        return f"{feature} Jitter (ms)"
     elif "total_time" in metric:
-        return f"{feature} Total Time ({get_file_sizes(filesize)})"
+        return f"{feature} Total Time (s)"
     elif "total_dummy" in metric:
-        return f"{feature} False Cells ({get_file_sizes(filesize)})"
+        return f"{feature} False Cells"
     elif "dummy_ratio" in metric:
-        return f"{feature} False Cells Ratio ({get_file_sizes(filesize)})"
+        return f"{feature} False Cells Ratio"
     elif "packet_count" in metric:
-        return f"{feature} Total TLS Packet Count ({get_file_sizes(filesize)})"
+        return f"{feature} Total TLS Packet Count"
     else:
         return metric
 
@@ -442,19 +442,6 @@ def get_axis_label(metric):
         return "False Cells Ratio (%)"
     elif "packet_count" in metric:
         return "Nº of TLS Packets"
-    else:
-        return metric
-
-
-def get_units(metric):
-    if metric == "latency":
-        return "Latency (s)"
-    elif metric == "throughput":
-        return "Throughput (bytes/s)"
-    elif metric == "jitter":
-        return "Jitter (s)"
-    elif metric == "total_time":
-        return "Total time (s)"
     else:
         return metric
 
