@@ -6,14 +6,14 @@ import time
 import re
 
 # Input folder (contains subfolders with zips)
-BASE_DIR = "/home/guga/Documents/Thesis/testing/collections/EMULATED_OBS_RESULTS"
+BASE_DIR = "/home/guga/Documents/Thesis/testing/collections/DIST_OBS_RESULTS"
 # Output folder
 OUTPUT_DIR = "/home/guga/Documents/Thesis/testing/filtered_collections"
 # Websites file
 WEBSITES_FILE = "/home/guga/Documents/Thesis/testing/resources/websites.txt"
 
 INTERNAL_ZIP_DIR = "/testing/logs/wireshark"
-ALT_INTERNAL_ZIP_DIR = "/home/ubuntu/Thesis/testing/logs/wireshark"
+ALT_INTERNAL_ZIP_DIR = "/home/guga/Documents/Thesis/testing/logs/wireshark"
 # Map each folder name to a sample number
 SAMPLE_MAP = {
     # "authority": 1,

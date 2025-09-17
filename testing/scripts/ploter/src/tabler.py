@@ -1,6 +1,6 @@
 import json
 
-TEST_ENV = "local"
+TEST_ENV = "dist"
 
 
 def table_dummy(metric, filesize, data):
@@ -27,18 +27,18 @@ def table_dummy(metric, filesize, data):
     ):
         if file_size != filesize:
             continue
-        if eps < 0 and dummy < 0:
+        if float(eps) < 0.0 and float(dummy) < 0.0:
             # Control
             res["control"][sched] = float(metric_val)
-        elif dummy >= 0 and eps < 0:
+        elif float(dummy) >= 0.0 and float(eps) < 0.0:
             # Dummy
             res["Dummy"]["max"] = float(max(res["Dummy"]["max"], metric_val))
             res["Dummy"]["min"] = float(min(res["Dummy"]["min"], metric_val))
-        elif dummy < 0 and eps >= 0:
+        elif float(dummy) < 0.0 and float(eps) >= 0.0:
             # Jitter
             res["Jitter"]["max"] = float(max(res["Jitter"]["max"], metric_val))
             res["Jitter"]["min"] = float(min(res["Jitter"]["min"], metric_val))
-        elif dummy >= 0 and eps >= 0:
+        elif float(dummy) >= 0.0 and float(eps) >= 0.0:
             # Both
             res["Both"]["max"] = float(max(res["Both"]["max"], metric_val))
             res["Both"]["min"] = float(min(res["Both"]["min"], metric_val))
