@@ -39,19 +39,26 @@ docker-push:
 
 #Test Resolves Manipulation and Handling
 
-observe: testing/scripts/observer/observer.sh .venv/bin/activate
-	@sh -c "./testing/scripts/observer/observer.sh"
+observe: testing/scripts/observer/observe.sh .venv/bin/activate
+	@sh -c "./testing/scripts/observer/observe.sh"
 
-analyze: testing/scripts/analyzer/analyzer.sh .venv/bin/activate
-	@sh -c "./testing/scripts/analyzer/analyzer.sh"
+analyze: testing/scripts/analyzer/main.py .venv/bin/activate
+	@python "./testing/scripts/analyzer/main.py"
 
-plot: testing/scripts/plotter/plotter.sh .venv/bin/activate
-	@sh -c "./testing/scripts/plotter/plotter.sh"
+plot: testing/scripts/ploter/main.py .venv/bin/activate
+	@python "./testing/scripts/ploter/main.py"
 
-wrap: testing/scripts/wrapper/wrapper.sh
-	@sh -c "./testing/scripts/wrapper/wrapper.sh"
+wrap: testing/scripts/wrapper/main.py .venv/bin/activate
+	@python "./testing/scripts/wrapper/main.py"
 
 # Test cases
+
+control-perf: testing/scripts/tester/monitor.sh testing/scripts/tester/configs/control.perf.yaml
+	@sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/configs/control.perf.yaml -v"
+
+control-obs: testing/scripts/tester/monitor.sh testing/scripts/tester/configs/control.obs.yaml
+	@sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/configs/control.obs.yaml -v"
+
 jitter-perf: testing/scripts/tester/monitor.sh testing/scripts/tester/configs/jitter.perf.yaml
 	@sh -c "./testing/scripts/tester/monitor.sh -c testing/scripts/tester/configs/jitter.perf.yaml -v"
 

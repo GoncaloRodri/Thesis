@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SOURCES_DIRECTORY="/home/ubuntu/Thesis/testing/filtered_collections"
-DEST_FOLDER="/home/ubuntu/Thesis/testing/results/observations"
+SOURCES_DIRECTORY="/home/guga/Documents/Thesis/testing/filtered_collections"
+DEST_FOLDER="/home/guga/Documents/Thesis/testing/results/observations"
 RESULTS_FOLDER="./data/results"
 PCAP_FOLDER="./data/pcaps"
 MODELS_FOLDER="./data/models"
@@ -22,9 +22,6 @@ show_spinner() {
 }
 
 cd wf-pipeline
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
 
 for SUB in "${SOURCES_DIRECTORY}"/*/; do
     if [ -d "$SUB" ]; then
@@ -62,8 +59,6 @@ for SUB in "${SOURCES_DIRECTORY}"/*/; do
     exit 0
 
 done
-
-deactivate
 
 echo "Finished observing source pcap files."
 
